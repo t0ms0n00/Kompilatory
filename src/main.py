@@ -60,7 +60,7 @@ def t_error(t) :
 
 
 lexer = lex.lex()
-fh = open("utils/test1.txt", "r")
+fh = open("./utils/test1.txt", "r")
 lexer.input(fh.read())
 for token in lexer:
     print("(%d): %s(%s)" %(token.lineno, token.type, token.value))

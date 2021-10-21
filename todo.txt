@@ -1,0 +1,11 @@
+operator zakresu: :
+transpozycja macierzy: '
+przecinek i średnik: , ;
+słowa kluczowe: if, else, for, while
+słowa kluczowe: break, continue oraz return
+słowa kluczowe: eye, zeros oraz ones
+słowa kluczowe: print
+identyfikatory (pierwszy znak identyfikatora to litera lub znak _, w kolejnych znakach mogą dodatkowo wystąpić cyfry)
+liczby całkowite
+liczby zmiennoprzecinkowe
+stringi
