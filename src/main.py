@@ -55,12 +55,12 @@ def t_newline(t):
 
 
 def t_error(t) :
-    print ("Illegal character '%s'" %t.value[0])
+    print("Illegal character '%s'" %t.value[0])
     t.lexer.skip(1)
 
 
 lexer = lex.lex()
-fh = open("./test1.txt", "r");
-lexer.input( fh.read() )
+fh = open("utils/test1.txt", "r")
+lexer.input(fh.read())
 for token in lexer:
     print("(%d): %s(%s)" %(token.lineno, token.type, token.value))
