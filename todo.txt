@@ -1,5 +1,0 @@
-słowa kluczowe: if, else, for, while
-słowa kluczowe: break, continue oraz return
-słowa kluczowe: eye, zeros oraz ones
-słowa kluczowe: print
-stringi - może być problem ze stringiem przez kilka linii - traktuje jako id tokeny

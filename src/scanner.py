@@ -1,7 +1,23 @@
 import ply.lex as lex
 
-tokens = ('INTEGER', 'FLOAT', 'STRING', 'ID', 'ADDASSIGN', 'MULASSIGN', 'SUBASSIGN', 'DIVASSIGN', 'DOTADD', 'DOTSUB',
-          'DOTMUL', 'DOTDIV', 'LESSEQUAL', 'GREATEREQUAL', 'NOTEQUAL', 'EQUAL')
+reserved = {
+    'if'        : "IF",
+    'else'      : "ELSE",
+    'for'       : "FOR",
+    'break'     : "BREAK",
+    'continue'  : "CONTINUE",
+    'return'    : "RETURN",
+    'eye'       : "EYE",
+    'zeros'     : "ZEROS",
+    'ones'      : "ONES",
+    'print'     : "PRINT"
+}
+
+tokens = ['INTEGER', 'FLOAT', 'STRING', 'ID', 'ADDASSIGN', 'MULASSIGN', 'SUBASSIGN', 'DIVASSIGN', 'DOTADD', 'DOTSUB',
+          'DOTMUL', 'DOTDIV', 'LESSEQUAL', 'GREATEREQUAL', 'NOTEQUAL', 'EQUAL',
+          ] + list(reserved.values())
+
+
 
 literals = "+-*/=<>(){}[]:',;"
 
@@ -47,6 +63,7 @@ def t_COMMENT(t):
 
 def t_ID(t):
     r'[a-zA-Z_]\w*'
+    t.type = reserved.get(t.value, 'ID')
     return t
 
 
@@ -56,10 +73,8 @@ def t_newline(t):
 
 
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    print("ERROR ({}): Illegal character {}".format(t.lexer.lineno, t.value[0]))
     t.lexer.skip(1)
 
 
 lexer = lex.lex()
-
-// sdfsdfsdf
