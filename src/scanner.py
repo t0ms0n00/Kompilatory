@@ -17,8 +17,6 @@ tokens = ['INTEGER', 'FLOAT', 'STRING', 'ID', 'ADDASSIGN', 'MULASSIGN', 'SUBASSI
           'DOTMUL', 'DOTDIV', 'LESSEQUAL', 'GREATEREQUAL', 'NOTEQUAL', 'EQUAL',
           ] + list(reserved.values())
 
-
-
 literals = "+-*/=<>(){}[]:',;"
 
 t_ADDASSIGN = r'\+='
@@ -39,13 +37,13 @@ t_EQUAL = r'=='
 t_ignore = '  \t'
 
 
-def t_STRING(t):
-    r'".*"'
+def t_STRING(t):        # dopisać cytowania możliwe w stringu
+    r'"(.|(\\".*\\"))*?[^\\]"'
     return t
 
 
 def t_FLOAT(t):
-    r'((\d*\.\d+)|(\d+\.\d*))((E|e)(\+|-)?\d+)?'        # żeby nie łapało samej . i pozwalało na 0. i .0
+    r'((\d*\.\d+)|(\d+\.))([Ee][+\-]?\d+)?'        # żeby nie łapało samej . i pozwalało na 0. i .0
     t.value = float(t.value)
     return t
 

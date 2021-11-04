@@ -1,0 +1,467 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    ADDASSIGN
+    BREAK
+    CONTINUE
+    DIVASSIGN
+    DOTADD
+    DOTDIV
+    DOTMUL
+    DOTSUB
+    ELSE
+    EQUAL
+    EYE
+    FOR
+    GREATEREQUAL
+    IF
+    LESSEQUAL
+    MULASSIGN
+    NOTEQUAL
+    ONES
+    PRINT
+    RETURN
+    STRING
+    SUBASSIGN
+    ZEROS
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> instructions_opt
+Rule 2     instructions_opt -> instructions
+Rule 3     instructions_opt -> <empty>
+Rule 4     instructions -> instructions instruction
+Rule 5     instructions -> instruction
+Rule 6     instruction -> ID = expression ;
+Rule 7     instruction -> <empty>
+Rule 8     assign -> <empty>
+Rule 9     expression -> expression + expression
+Rule 10    expression -> expression - expression
+Rule 11    expression -> expression * expression
+Rule 12    expression -> expression / expression
+Rule 13    expression -> ( expression )
+Rule 14    expression -> INTEGER
+Rule 15    expression -> FLOAT
+Rule 16    expression -> ID
+
+Terminals, with rules where they appear
+
+(                    : 13
+)                    : 13
+*                    : 11
++                    : 9
+-                    : 10
+/                    : 12
+;                    : 6
+=                    : 6
+ADDASSIGN            : 
+BREAK                : 
+CONTINUE             : 
+DIVASSIGN            : 
+DOTADD               : 
+DOTDIV               : 
+DOTMUL               : 
+DOTSUB               : 
+ELSE                 : 
+EQUAL                : 
+EYE                  : 
+FLOAT                : 15
+FOR                  : 
+GREATEREQUAL         : 
+ID                   : 6 16
+IF                   : 
+INTEGER              : 14
+LESSEQUAL            : 
+MULASSIGN            : 
+NOTEQUAL             : 
+ONES                 : 
+PRINT                : 
+RETURN               : 
+STRING               : 
+SUBASSIGN            : 
+ZEROS                : 
+error                : 
+
+Nonterminals, with rules where they appear
+
+assign               : 
+expression           : 6 9 9 10 10 11 11 12 12 13
+instruction          : 4 5
+instructions         : 2 4
+instructions_opt     : 1
+program              : 0
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . instructions_opt
+    (2) instructions_opt -> . instructions
+    (3) instructions_opt -> .
+    (4) instructions -> . instructions instruction
+    (5) instructions -> . instruction
+    (6) instruction -> . ID = expression ;
+    (7) instruction -> .
+
+  ! shift/reduce conflict for ID resolved as shift
+  ! reduce/reduce conflict for $end resolved using rule 3 (instructions_opt -> .)
+    $end            reduce using rule 3 (instructions_opt -> .)
+    ID              shift and go to state 5
+
+  ! ID              [ reduce using rule 7 (instruction -> .) ]
+  ! $end            [ reduce using rule 7 (instruction -> .) ]
+
+    program                        shift and go to state 1
+    instructions_opt               shift and go to state 2
+    instructions                   shift and go to state 3
+    instruction                    shift and go to state 4
+
+state 1
+
+    (0) S' -> program .
+
+
+
+state 2
+
+    (1) program -> instructions_opt .
+
+    $end            reduce using rule 1 (program -> instructions_opt .)
+
+
+state 3
+
+    (2) instructions_opt -> instructions .
+    (4) instructions -> instructions . instruction
+    (6) instruction -> . ID = expression ;
+    (7) instruction -> .
+
+  ! shift/reduce conflict for ID resolved as shift
+  ! reduce/reduce conflict for $end resolved using rule 2 (instructions_opt -> instructions .)
+    $end            reduce using rule 2 (instructions_opt -> instructions .)
+    ID              shift and go to state 5
+
+  ! ID              [ reduce using rule 7 (instruction -> .) ]
+  ! $end            [ reduce using rule 7 (instruction -> .) ]
+
+    instruction                    shift and go to state 6
+
+state 4
+
+    (5) instructions -> instruction .
+
+    ID              reduce using rule 5 (instructions -> instruction .)
+    $end            reduce using rule 5 (instructions -> instruction .)
+
+
+state 5
+
+    (6) instruction -> ID . = expression ;
+
+    =               shift and go to state 7
+
+
+state 6
+
+    (4) instructions -> instructions instruction .
+
+    ID              reduce using rule 4 (instructions -> instructions instruction .)
+    $end            reduce using rule 4 (instructions -> instructions instruction .)
+
+
+state 7
+
+    (6) instruction -> ID = . expression ;
+    (9) expression -> . expression + expression
+    (10) expression -> . expression - expression
+    (11) expression -> . expression * expression
+    (12) expression -> . expression / expression
+    (13) expression -> . ( expression )
+    (14) expression -> . INTEGER
+    (15) expression -> . FLOAT
+    (16) expression -> . ID
+
+    (               shift and go to state 10
+    INTEGER         shift and go to state 11
+    FLOAT           shift and go to state 12
+    ID              shift and go to state 8
+
+    expression                     shift and go to state 9
+
+state 8
+
+    (16) expression -> ID .
+
+    ;               reduce using rule 16 (expression -> ID .)
+    +               reduce using rule 16 (expression -> ID .)
+    -               reduce using rule 16 (expression -> ID .)
+    *               reduce using rule 16 (expression -> ID .)
+    /               reduce using rule 16 (expression -> ID .)
+    )               reduce using rule 16 (expression -> ID .)
+
+
+state 9
+
+    (6) instruction -> ID = expression . ;
+    (9) expression -> expression . + expression
+    (10) expression -> expression . - expression
+    (11) expression -> expression . * expression
+    (12) expression -> expression . / expression
+
+    ;               shift and go to state 13
+    +               shift and go to state 14
+    -               shift and go to state 15
+    *               shift and go to state 16
+    /               shift and go to state 17
+
+
+state 10
+
+    (13) expression -> ( . expression )
+    (9) expression -> . expression + expression
+    (10) expression -> . expression - expression
+    (11) expression -> . expression * expression
+    (12) expression -> . expression / expression
+    (13) expression -> . ( expression )
+    (14) expression -> . INTEGER
+    (15) expression -> . FLOAT
+    (16) expression -> . ID
+
+    (               shift and go to state 10
+    INTEGER         shift and go to state 11
+    FLOAT           shift and go to state 12
+    ID              shift and go to state 8
+
+    expression                     shift and go to state 18
+
+state 11
+
+    (14) expression -> INTEGER .
+
+    ;               reduce using rule 14 (expression -> INTEGER .)
+    +               reduce using rule 14 (expression -> INTEGER .)
+    -               reduce using rule 14 (expression -> INTEGER .)
+    *               reduce using rule 14 (expression -> INTEGER .)
+    /               reduce using rule 14 (expression -> INTEGER .)
+    )               reduce using rule 14 (expression -> INTEGER .)
+
+
+state 12
+
+    (15) expression -> FLOAT .
+
+    ;               reduce using rule 15 (expression -> FLOAT .)
+    +               reduce using rule 15 (expression -> FLOAT .)
+    -               reduce using rule 15 (expression -> FLOAT .)
+    *               reduce using rule 15 (expression -> FLOAT .)
+    /               reduce using rule 15 (expression -> FLOAT .)
+    )               reduce using rule 15 (expression -> FLOAT .)
+
+
+state 13
+
+    (6) instruction -> ID = expression ; .
+
+    ID              reduce using rule 6 (instruction -> ID = expression ; .)
+    $end            reduce using rule 6 (instruction -> ID = expression ; .)
+
+
+state 14
+
+    (9) expression -> expression + . expression
+    (9) expression -> . expression + expression
+    (10) expression -> . expression - expression
+    (11) expression -> . expression * expression
+    (12) expression -> . expression / expression
+    (13) expression -> . ( expression )
+    (14) expression -> . INTEGER
+    (15) expression -> . FLOAT
+    (16) expression -> . ID
+
+    (               shift and go to state 10
+    INTEGER         shift and go to state 11
+    FLOAT           shift and go to state 12
+    ID              shift and go to state 8
+
+    expression                     shift and go to state 19
+
+state 15
+
+    (10) expression -> expression - . expression
+    (9) expression -> . expression + expression
+    (10) expression -> . expression - expression
+    (11) expression -> . expression * expression
+    (12) expression -> . expression / expression
+    (13) expression -> . ( expression )
+    (14) expression -> . INTEGER
+    (15) expression -> . FLOAT
+    (16) expression -> . ID
+
+    (               shift and go to state 10
+    INTEGER         shift and go to state 11
+    FLOAT           shift and go to state 12
+    ID              shift and go to state 8
+
+    expression                     shift and go to state 20
+
+state 16
+
+    (11) expression -> expression * . expression
+    (9) expression -> . expression + expression
+    (10) expression -> . expression - expression
+    (11) expression -> . expression * expression
+    (12) expression -> . expression / expression
+    (13) expression -> . ( expression )
+    (14) expression -> . INTEGER
+    (15) expression -> . FLOAT
+    (16) expression -> . ID
+
+    (               shift and go to state 10
+    INTEGER         shift and go to state 11
+    FLOAT           shift and go to state 12
+    ID              shift and go to state 8
+
+    expression                     shift and go to state 21
+
+state 17
+
+    (12) expression -> expression / . expression
+    (9) expression -> . expression + expression
+    (10) expression -> . expression - expression
+    (11) expression -> . expression * expression
+    (12) expression -> . expression / expression
+    (13) expression -> . ( expression )
+    (14) expression -> . INTEGER
+    (15) expression -> . FLOAT
+    (16) expression -> . ID
+
+    (               shift and go to state 10
+    INTEGER         shift and go to state 11
+    FLOAT           shift and go to state 12
+    ID              shift and go to state 8
+
+    expression                     shift and go to state 22
+
+state 18
+
+    (13) expression -> ( expression . )
+    (9) expression -> expression . + expression
+    (10) expression -> expression . - expression
+    (11) expression -> expression . * expression
+    (12) expression -> expression . / expression
+
+    )               shift and go to state 23
+    +               shift and go to state 14
+    -               shift and go to state 15
+    *               shift and go to state 16
+    /               shift and go to state 17
+
+
+state 19
+
+    (9) expression -> expression + expression .
+    (9) expression -> expression . + expression
+    (10) expression -> expression . - expression
+    (11) expression -> expression . * expression
+    (12) expression -> expression . / expression
+
+    ;               reduce using rule 9 (expression -> expression + expression .)
+    +               reduce using rule 9 (expression -> expression + expression .)
+    -               reduce using rule 9 (expression -> expression + expression .)
+    )               reduce using rule 9 (expression -> expression + expression .)
+    *               shift and go to state 16
+    /               shift and go to state 17
+
+  ! *               [ reduce using rule 9 (expression -> expression + expression .) ]
+  ! /               [ reduce using rule 9 (expression -> expression + expression .) ]
+  ! +               [ shift and go to state 14 ]
+  ! -               [ shift and go to state 15 ]
+
+
+state 20
+
+    (10) expression -> expression - expression .
+    (9) expression -> expression . + expression
+    (10) expression -> expression . - expression
+    (11) expression -> expression . * expression
+    (12) expression -> expression . / expression
+
+    ;               reduce using rule 10 (expression -> expression - expression .)
+    +               reduce using rule 10 (expression -> expression - expression .)
+    -               reduce using rule 10 (expression -> expression - expression .)
+    )               reduce using rule 10 (expression -> expression - expression .)
+    *               shift and go to state 16
+    /               shift and go to state 17
+
+  ! *               [ reduce using rule 10 (expression -> expression - expression .) ]
+  ! /               [ reduce using rule 10 (expression -> expression - expression .) ]
+  ! +               [ shift and go to state 14 ]
+  ! -               [ shift and go to state 15 ]
+
+
+state 21
+
+    (11) expression -> expression * expression .
+    (9) expression -> expression . + expression
+    (10) expression -> expression . - expression
+    (11) expression -> expression . * expression
+    (12) expression -> expression . / expression
+
+    ;               reduce using rule 11 (expression -> expression * expression .)
+    +               reduce using rule 11 (expression -> expression * expression .)
+    -               reduce using rule 11 (expression -> expression * expression .)
+    *               reduce using rule 11 (expression -> expression * expression .)
+    /               reduce using rule 11 (expression -> expression * expression .)
+    )               reduce using rule 11 (expression -> expression * expression .)
+
+  ! +               [ shift and go to state 14 ]
+  ! -               [ shift and go to state 15 ]
+  ! *               [ shift and go to state 16 ]
+  ! /               [ shift and go to state 17 ]
+
+
+state 22
+
+    (12) expression -> expression / expression .
+    (9) expression -> expression . + expression
+    (10) expression -> expression . - expression
+    (11) expression -> expression . * expression
+    (12) expression -> expression . / expression
+
+    ;               reduce using rule 12 (expression -> expression / expression .)
+    +               reduce using rule 12 (expression -> expression / expression .)
+    -               reduce using rule 12 (expression -> expression / expression .)
+    *               reduce using rule 12 (expression -> expression / expression .)
+    /               reduce using rule 12 (expression -> expression / expression .)
+    )               reduce using rule 12 (expression -> expression / expression .)
+
+  ! +               [ shift and go to state 14 ]
+  ! -               [ shift and go to state 15 ]
+  ! *               [ shift and go to state 16 ]
+  ! /               [ shift and go to state 17 ]
+
+
+state 23
+
+    (13) expression -> ( expression ) .
+
+    ;               reduce using rule 13 (expression -> ( expression ) .)
+    +               reduce using rule 13 (expression -> ( expression ) .)
+    -               reduce using rule 13 (expression -> ( expression ) .)
+    *               reduce using rule 13 (expression -> ( expression ) .)
+    /               reduce using rule 13 (expression -> ( expression ) .)
+    )               reduce using rule 13 (expression -> ( expression ) .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for ID in state 0 resolved as shift
+WARNING: shift/reduce conflict for ID in state 3 resolved as shift
+WARNING: reduce/reduce conflict in state 0 resolved using rule (instructions_opt -> <empty>)
+WARNING: rejected rule (instruction -> <empty>) in state 0
+WARNING: reduce/reduce conflict in state 3 resolved using rule (instructions_opt -> instructions)
+WARNING: rejected rule (instruction -> <empty>) in state 3
+WARNING: Rule (instruction -> <empty>) is never reduced
