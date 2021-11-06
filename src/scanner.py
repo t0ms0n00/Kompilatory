@@ -14,7 +14,7 @@ reserved = {
 }
 
 tokens = ['INTEGER', 'FLOAT', 'STRING', 'ID', 'ADDASSIGN', 'MULASSIGN', 'SUBASSIGN', 'DIVASSIGN', 'DOTADD', 'DOTSUB',
-          'DOTMUL', 'DOTDIV', 'LESSEQUAL', 'GREATEREQUAL', 'NOTEQUAL', 'EQUAL',
+          'DOTMUL', 'DOTDIV', 'LESSEQUAL', 'GREATEREQUAL', 'NOTEQUAL', 'EQUAL'
           ] + list(reserved.values())
 
 literals = "+-*/=<>(){}[]:',;"
@@ -37,8 +37,9 @@ t_EQUAL = r'=='
 t_ignore = '  \t'
 
 
-def t_STRING(t):        # dopisać cytowania możliwe w stringu
-    r'"(.|(\\".*\\"))*?[^\\]"'
+def t_STRING(t):        # dopisać cytowania możliwe w stringu - DONE za pomoca \"
+    r'"([^"]|\\")*[^\\]"'        # nie uwzglednia wcale stringow ''
+    t.value = str(t.value).replace("\\\"", "\"")        # usuwa \ z \"
     return t
 
 
