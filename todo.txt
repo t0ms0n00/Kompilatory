@@ -1,4 +1,4 @@
-sprawdzić czy cytowanie w STRING jest ok
+sprawdzić czy cytowanie w STRING jest ok                                # chyba DONE
 wyrażenia binarne, w tym operacje macierzowe 'element po elemencie'
 wyrażenia relacyjne,
 negację unarną,
@@ -6,9 +6,5 @@ transpozycję macierzy,
 inicjalizację macierzy konkretnymi wartościami,
 macierzowe funkcje specjalne,
 instrukcję przypisania, w tym różne operatory przypisania
-instrukcję warunkową if-else,
-pętle: while and for,
-instrukcje break, continue oraz return,
-instrukcję print,
 instrukcje złożone,
 tablice oraz ich zakresy.
