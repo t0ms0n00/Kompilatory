@@ -7,6 +7,8 @@ precedence = (
     # to fill ...
     ('nonassoc', 'IFX'),
     ('nonassoc', 'ELSE'),
+    ('nonassoc', '=', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
+    ('nonassoc', '<', '>', 'LESSEQUAL', 'GREATEREQUAL', 'EQUAL', 'NOTEQUAL'),
     ("left", '+', '-'),
     ("left", '*', '/')
 
@@ -40,7 +42,7 @@ def p_instructions_1(p):
 def p_instructions_2(p):
     """ instructions : instruction """
 
-# -----------------------------------------------------
+
 def p_instruction(p):   # wszystkie reserved ze skanera, w assign bedzie eye, zeros, ones
     """ instruction : block
                     | if
@@ -53,13 +55,14 @@ def p_instruction(p):   # wszystkie reserved ze skanera, w assign bedzie eye, ze
                     | print
                     | assign """
 
+
 def p_block(p):
     """ block : '{' instructions '}' """
 
 
 def p_if(p):
-    """ if : IF '(' assignment ')' instruction %prec IFX
-           | IF '(' assignment ')' instruction ELSE instruction """
+    """ if : IF '(' condition ')' instruction %prec IFX
+           | IF '(' condition ')' instruction ELSE instruction """
 
 
 def p_for(p):
@@ -71,7 +74,7 @@ def p_range(p):
 
 
 def p_while(p):
-    """ while : '(' assignment ')' instruction """
+    """ while : WHILE '(' condition ')' instruction """
 
 
 def p_break(p):
@@ -102,23 +105,45 @@ def p_object(p):    # bedzie modyfikowane lub dodane zostana produkcje (matrix i
                | expression """
 
 
-def p_assign(p):    # do zrobienia funkcja i cale drzewo
-    """ assign : """
+def p_assign(p):    # do zrobienia funkcja i cale drzewo - chyba jest OK
+    """ assign : lvalue '=' object ';'
+                | lvalue calculation_assign object ';' """
 
 
-# def p_expression_binop(p):
-#     """expression  : expression '+' expression
-#                 | expression '-' expression
-#                 | expression '*' expression
-#                 | expression '/' expression
-#                 | '(' expression ')'
-#                 | INTEGER
-#                 | FLOAT
-#                 | ID"""
-#     if p[2] == '+'   : p[0] = p[1] + p[3] # czy bez spacji pójdzie powyżej
-#     elif p[2] == '-' : p[0] = p[1] - p[3]
-#     elif p[2] == '*' : p[0] = p[1] * p[3]
-#     elif p[2] == '/' : p[0] = p[1] / p[3]
+def p_calculation_assign(p):
+    """ calculation_assign : ADDASSIGN
+                            | SUBASSIGN
+                            | MULASSIGN
+                            | DIVASSIGN """
+
+
+def p_lvalue(p):
+    """ lvalue : ID
+                | matrix_element """        # tu brak pewności
+
+
+def p_matrix_element(p):    # do przedyskutowania, ogólnie ma służyć do operacji przypisania do elementu macierzy
+    """ matrix_element : ID '[' INTEGER ',' INTEGER ']'"""
+
+
+def p_condition(p):
+    """ condition : object comparator object """
+
+
+def p_comparator(p):
+    """ comparator : '<'
+                  | '>'
+                  | EQUAL
+                  | NOTEQUAL
+                  | LESSEQUAL
+                  | GREATEREQUAL """
+
+
+def p_expression_binop(p):  # wszelkiego rodzaju wyrażenia, podzieliłbym na grupy i do różnych funkcji
+    """expression  : expression '+' expression
+                | expression '-' expression
+                | expression '*' expression
+                | expression '/' expression"""
 
 
 parser = yacc.yacc()

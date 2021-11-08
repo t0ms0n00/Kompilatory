@@ -2,23 +2,13 @@ Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 
 Unused terminals:
 
-    ADDASSIGN
-    DIVASSIGN
     DOTADD
     DOTDIV
     DOTMUL
     DOTSUB
-    EQUAL
     EYE
     FLOAT
-    GREATEREQUAL
-    INTEGER
-    LESSEQUAL
-    MULASSIGN
-    NOTEQUAL
     ONES
-    SUBASSIGN
-    WHILE
     ZEROS
 
 Grammar
@@ -40,11 +30,11 @@ Rule 13    instruction -> return
 Rule 14    instruction -> print
 Rule 15    instruction -> assign
 Rule 16    block -> { instructions }
-Rule 17    if -> IF ( assignment ) instruction
-Rule 18    if -> IF ( assignment ) instruction ELSE instruction
+Rule 17    if -> IF ( condition ) instruction
+Rule 18    if -> IF ( condition ) instruction ELSE instruction
 Rule 19    for -> FOR ID = range instruction
 Rule 20    range -> expression : expression
-Rule 21    while -> ( assignment ) instruction
+Rule 21    while -> WHILE ( condition ) instruction
 Rule 22    break -> BREAK ;
 Rule 23    continue -> CONTINUE ;
 Rule 24    return -> RETURN ;
@@ -55,43 +45,70 @@ Rule 28    objects -> object , objects ;
 Rule 29    object -> STRING
 Rule 30    object -> ID
 Rule 31    object -> expression
-Rule 32    assign -> <empty>
+Rule 32    assign -> lvalue = object ;
+Rule 33    assign -> lvalue calculation_assign object ;
+Rule 34    calculation_assign -> ADDASSIGN
+Rule 35    calculation_assign -> SUBASSIGN
+Rule 36    calculation_assign -> MULASSIGN
+Rule 37    calculation_assign -> DIVASSIGN
+Rule 38    lvalue -> ID
+Rule 39    lvalue -> matrix_element
+Rule 40    matrix_element -> ID [ INTEGER , INTEGER ]
+Rule 41    condition -> object comparator object
+Rule 42    comparator -> <
+Rule 43    comparator -> >
+Rule 44    comparator -> EQUAL
+Rule 45    comparator -> NOTEQUAL
+Rule 46    comparator -> LESSEQUAL
+Rule 47    comparator -> GREATEREQUAL
+Rule 48    expression -> expression + expression
+Rule 49    expression -> expression - expression
+Rule 50    expression -> expression * expression
+Rule 51    expression -> expression / expression
 
 Terminals, with rules where they appear
 
 (                    : 17 18 21
 )                    : 17 18 21
-,                    : 28
+*                    : 50
++                    : 48
+,                    : 28 40
+-                    : 49
+/                    : 51
 :                    : 20
-;                    : 22 23 24 25 26 27 28
-=                    : 19
-ADDASSIGN            : 
+;                    : 22 23 24 25 26 27 28 32 33
+<                    : 42
+=                    : 19 32
+>                    : 43
+ADDASSIGN            : 34
 BREAK                : 22
 CONTINUE             : 23
-DIVASSIGN            : 
+DIVASSIGN            : 37
 DOTADD               : 
 DOTDIV               : 
 DOTMUL               : 
 DOTSUB               : 
 ELSE                 : 18
-EQUAL                : 
+EQUAL                : 44
 EYE                  : 
 FLOAT                : 
 FOR                  : 19
-GREATEREQUAL         : 
-ID                   : 19 30
+GREATEREQUAL         : 47
+ID                   : 19 30 38 40
 IF                   : 17 18
-INTEGER              : 
-LESSEQUAL            : 
-MULASSIGN            : 
-NOTEQUAL             : 
+INTEGER              : 40 40
+LESSEQUAL            : 46
+MULASSIGN            : 36
+NOTEQUAL             : 45
 ONES                 : 
 PRINT                : 26 27
 RETURN               : 24 25
 STRING               : 29
-SUBASSIGN            : 
-WHILE                : 
+SUBASSIGN            : 35
+WHILE                : 21
 ZEROS                : 
+[                    : 40
+]                    : 40
 error                : 
 {                    : 16
 }                    : 16
@@ -99,18 +116,22 @@ error                :
 Nonterminals, with rules where they appear
 
 assign               : 15
-assignment           : 17 18 21
 block                : 6
 break                : 11
+calculation_assign   : 33
+comparator           : 41
+condition            : 17 18 21
 continue             : 12
 else                 : 8
-expression           : 20 20 25 31
+expression           : 20 20 25 31 48 48 49 49 50 50 51 51
 for                  : 9
 if                   : 7
 instruction          : 4 5 17 18 18 19 21
 instructions         : 2 4 16
 instructions_opt     : 1
-object               : 26 28
+lvalue               : 32 33
+matrix_element       : 39
+object               : 26 28 32 33 41 41
 objects              : 27 28
 print                : 14
 program              : 0
