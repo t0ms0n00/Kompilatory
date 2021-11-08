@@ -4,15 +4,15 @@ import ply.yacc as yacc
 tokens = scanner.tokens
 
 precedence = (
-    # to fill ...
     ('nonassoc', 'IFX'),
     ('nonassoc', 'ELSE'),
     ('nonassoc', '=', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
     ('nonassoc', '<', '>', 'LESSEQUAL', 'GREATEREQUAL', 'EQUAL', 'NOTEQUAL'),
     ("left", '+', '-'),
-    ("left", '*', '/')
-
-    # to fill ...
+    ("left", "DOTADD", "DOTSUB"),
+    ("left", '*', '/'),
+    ("left", "DOTMUL", "DOTDIV"),
+    ('right', 'UMINUS')
 )
 
 
@@ -90,19 +90,32 @@ def p_return(p):
                | RETURN expression ';' """
 
 
+# def p_print(p): # pozostawiam zakomentowane ale chyba brakuje stopu dla wywoływania się objects, niżej przerobione, zostawiam jeśli nie złapałem idei
+#     """ print : PRINT object ';'
+#               | PRINT objects ';' """
+#
+#
+# def p_objects(p):
+#     """ objects : object ',' objects ';' """
+
 def p_print(p):
-    """ print : PRINT object ';'
-              | PRINT objects ';' """
+    """ print : PRINT objects ';' """
 
 
-def p_objects(p):
+def p_objects_singular(p):
+    """ objects : object ';' """
+
+
+def p_objects_plural(p):
     """ objects : object ',' objects ';' """
 
 
 def p_object(p):    # bedzie modyfikowane lub dodane zostana produkcje (matrix itp.)
     """ object : STRING
                | ID
-               | expression """
+               | INTEGER
+               | FLOAT
+               | expression"""
 
 
 def p_assign(p):    # do zrobienia funkcja i cale drzewo - chyba jest OK
@@ -122,7 +135,8 @@ def p_lvalue(p):
                 | matrix_element """        # tu brak pewności
 
 
-def p_matrix_element(p):    # do przedyskutowania, ogólnie ma służyć do operacji przypisania do elementu macierzy
+# do przedyskutowania, ogólnie ma służyć do operacji przypisania do elementu macierzy, ale pewnie wyjdzie lepiej jak się macierz zdefiniuje
+def p_matrix_element(p):
     """ matrix_element : ID '[' INTEGER ',' INTEGER ']'"""
 
 
@@ -138,12 +152,33 @@ def p_comparator(p):
                   | LESSEQUAL
                   | GREATEREQUAL """
 
+# WAŻNE: Nie wiem, które rozw. lepsze, bo mamy symbol object, który potrafi wywołać expression, więc można:
+# 1. przez object dostawać się do expression ponownie i wtedy object zawiera wszystkie typy (ID, STRING, matrix, etc)
+# 2. wszędzie na dole prawe strony object zmienić na expression i dodać p_expression_ID itd. , ale wtedy może być
+# redundancja bo mamy to w object
+# 3. Jakieś inne rozw.
 
-def p_expression_binop(p):  # wszelkiego rodzaju wyrażenia, podzieliłbym na grupy i do różnych funkcji
-    """expression  : expression '+' expression
-                | expression '-' expression
-                | expression '*' expression
-                | expression '/' expression"""
+
+def p_expression_binop(p):
+    """expression  : object '+' object
+                | object '-' object
+                | object '*' object
+                | object '/' object"""
+
+
+def p_expression_matrixop(p):
+    """expression : object DOTADD object
+                    | object DOTSUB object
+                    | object DOTMUL object
+                    | object DOTDIV object"""
+
+
+def p_expression_uminus(p):
+    """expression : '-' object %prec UMINUS"""
+
+
+def p_expression_parentheses(p):
+    """expression : '(' object ')'"""
 
 
 parser = yacc.yacc()

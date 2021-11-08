@@ -2,12 +2,7 @@ Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 
 Unused terminals:
 
-    DOTADD
-    DOTDIV
-    DOTMUL
-    DOTSUB
     EYE
-    FLOAT
     ONES
     ZEROS
 
@@ -39,76 +34,84 @@ Rule 22    break -> BREAK ;
 Rule 23    continue -> CONTINUE ;
 Rule 24    return -> RETURN ;
 Rule 25    return -> RETURN expression ;
-Rule 26    print -> PRINT object ;
-Rule 27    print -> PRINT objects ;
+Rule 26    print -> PRINT objects ;
+Rule 27    objects -> object ;
 Rule 28    objects -> object , objects ;
 Rule 29    object -> STRING
 Rule 30    object -> ID
-Rule 31    object -> expression
-Rule 32    assign -> lvalue = object ;
-Rule 33    assign -> lvalue calculation_assign object ;
-Rule 34    calculation_assign -> ADDASSIGN
-Rule 35    calculation_assign -> SUBASSIGN
-Rule 36    calculation_assign -> MULASSIGN
-Rule 37    calculation_assign -> DIVASSIGN
-Rule 38    lvalue -> ID
-Rule 39    lvalue -> matrix_element
-Rule 40    matrix_element -> ID [ INTEGER , INTEGER ]
-Rule 41    condition -> object comparator object
-Rule 42    comparator -> <
-Rule 43    comparator -> >
-Rule 44    comparator -> EQUAL
-Rule 45    comparator -> NOTEQUAL
-Rule 46    comparator -> LESSEQUAL
-Rule 47    comparator -> GREATEREQUAL
-Rule 48    expression -> expression + expression
-Rule 49    expression -> expression - expression
-Rule 50    expression -> expression * expression
-Rule 51    expression -> expression / expression
+Rule 31    object -> INTEGER
+Rule 32    object -> FLOAT
+Rule 33    object -> expression
+Rule 34    assign -> lvalue = object ;
+Rule 35    assign -> lvalue calculation_assign object ;
+Rule 36    calculation_assign -> ADDASSIGN
+Rule 37    calculation_assign -> SUBASSIGN
+Rule 38    calculation_assign -> MULASSIGN
+Rule 39    calculation_assign -> DIVASSIGN
+Rule 40    lvalue -> ID
+Rule 41    lvalue -> matrix_element
+Rule 42    matrix_element -> ID [ INTEGER , INTEGER ]
+Rule 43    condition -> object comparator object
+Rule 44    comparator -> <
+Rule 45    comparator -> >
+Rule 46    comparator -> EQUAL
+Rule 47    comparator -> NOTEQUAL
+Rule 48    comparator -> LESSEQUAL
+Rule 49    comparator -> GREATEREQUAL
+Rule 50    expression -> object + object
+Rule 51    expression -> object - object
+Rule 52    expression -> object * object
+Rule 53    expression -> object / object
+Rule 54    expression -> object DOTADD object
+Rule 55    expression -> object DOTSUB object
+Rule 56    expression -> object DOTMUL object
+Rule 57    expression -> object DOTDIV object
+Rule 58    expression -> - object
+Rule 59    expression -> ( object )
 
 Terminals, with rules where they appear
 
-(                    : 17 18 21
-)                    : 17 18 21
-*                    : 50
-+                    : 48
-,                    : 28 40
--                    : 49
-/                    : 51
+(                    : 17 18 21 59
+)                    : 17 18 21 59
+*                    : 52
++                    : 50
+,                    : 28 42
+-                    : 51 58
+/                    : 53
 :                    : 20
-;                    : 22 23 24 25 26 27 28 32 33
-<                    : 42
-=                    : 19 32
->                    : 43
-ADDASSIGN            : 34
+;                    : 22 23 24 25 26 27 28 34 35
+<                    : 44
+=                    : 19 34
+>                    : 45
+ADDASSIGN            : 36
 BREAK                : 22
 CONTINUE             : 23
-DIVASSIGN            : 37
-DOTADD               : 
-DOTDIV               : 
-DOTMUL               : 
-DOTSUB               : 
+DIVASSIGN            : 39
+DOTADD               : 54
+DOTDIV               : 57
+DOTMUL               : 56
+DOTSUB               : 55
 ELSE                 : 18
-EQUAL                : 44
+EQUAL                : 46
 EYE                  : 
-FLOAT                : 
+FLOAT                : 32
 FOR                  : 19
-GREATEREQUAL         : 47
-ID                   : 19 30 38 40
+GREATEREQUAL         : 49
+ID                   : 19 30 40 42
 IF                   : 17 18
-INTEGER              : 40 40
-LESSEQUAL            : 46
-MULASSIGN            : 36
-NOTEQUAL             : 45
+INTEGER              : 31 42 42
+LESSEQUAL            : 48
+MULASSIGN            : 38
+NOTEQUAL             : 47
 ONES                 : 
-PRINT                : 26 27
+PRINT                : 26
 RETURN               : 24 25
 STRING               : 29
-SUBASSIGN            : 35
+SUBASSIGN            : 37
 WHILE                : 21
 ZEROS                : 
-[                    : 40
-]                    : 40
+[                    : 42
+]                    : 42
 error                : 
 {                    : 16
 }                    : 16
@@ -118,21 +121,21 @@ Nonterminals, with rules where they appear
 assign               : 15
 block                : 6
 break                : 11
-calculation_assign   : 33
-comparator           : 41
+calculation_assign   : 35
+comparator           : 43
 condition            : 17 18 21
 continue             : 12
 else                 : 8
-expression           : 20 20 25 31 48 48 49 49 50 50 51 51
+expression           : 20 20 25 33
 for                  : 9
 if                   : 7
 instruction          : 4 5 17 18 18 19 21
 instructions         : 2 4 16
 instructions_opt     : 1
-lvalue               : 32 33
-matrix_element       : 39
-object               : 26 28 32 33 41 41
-objects              : 27 28
+lvalue               : 34 35
+matrix_element       : 41
+object               : 27 28 34 35 43 43 50 50 51 51 52 52 53 53 54 54 55 55 56 56 57 57 58 59
+objects              : 26 28
 print                : 14
 program              : 0
 range                : 19
