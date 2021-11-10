@@ -46,7 +46,6 @@ def p_instructions_2(p):
 def p_instruction(p):   # wszystkie reserved ze skanera, w assign bedzie eye, zeros, ones
     """ instruction : block
                     | if
-                    | else
                     | for
                     | while
                     | break
@@ -70,7 +69,7 @@ def p_for(p):
 
 
 def p_range(p):
-    """ range : expression ':' expression"""
+    """ range : object ':' object"""
 
 
 def p_while(p):
@@ -87,35 +86,30 @@ def p_continue(p):
 
 def p_return(p):
     """ return : RETURN ';'
-               | RETURN expression ';' """
+               | RETURN object ';' """
 
-
-# def p_print(p): # pozostawiam zakomentowane ale chyba brakuje stopu dla wywoływania się objects, niżej przerobione, zostawiam jeśli nie złapałem idei
-#     """ print : PRINT object ';'
-#               | PRINT objects ';' """
-#
-#
-# def p_objects(p):
-#     """ objects : object ',' objects ';' """
 
 def p_print(p):
     """ print : PRINT objects ';' """
 
 
 def p_objects_singular(p):
-    """ objects : object ';' """
+    """ objects : object """
 
 
 def p_objects_plural(p):
-    """ objects : object ',' objects ';' """
+    """ objects : object ',' objects  """
 
 
-def p_object(p):    # bedzie modyfikowane lub dodane zostana produkcje (matrix itp.)
+def p_object(p):    # bedzie modyfikowane lub dodane zostana produkcje (matrix itp.) -> zamiast matrix zrobiłem vector
+    # vector może przejść taką drogę do matrix: vector -> [objects] -> [object, object, object] -> [vector, vector, vector] ->
+    # -> [[objects], [objects], [objects]] itd
     """ object : STRING
-               | ID
                | INTEGER
                | FLOAT
-               | expression"""
+               | expression
+               | lvalue
+               | vector"""
 
 
 def p_assign(p):    # do zrobienia funkcja i cale drzewo - chyba jest OK
@@ -132,12 +126,8 @@ def p_calculation_assign(p):
 
 def p_lvalue(p):
     """ lvalue : ID
-                | matrix_element """        # tu brak pewności
-
-
-# do przedyskutowania, ogólnie ma służyć do operacji przypisania do elementu macierzy, ale pewnie wyjdzie lepiej jak się macierz zdefiniuje
-def p_matrix_element(p):
-    """ matrix_element : ID '[' INTEGER ',' INTEGER ']'"""
+                | ID '[' INTEGER ']'
+                | ID '[' INTEGER ',' INTEGER ']' """
 
 
 def p_condition(p):
@@ -179,6 +169,25 @@ def p_expression_uminus(p):
 
 def p_expression_parentheses(p):
     """expression : '(' object ')'"""
+
+
+def p_expression_transpose(p):
+    """expression : object "'" """
+
+
+def p_expression_matrix_functions(p):
+    """expression : matrix_func '(' object ')' 
+              | matrix_func '(' object ',' object ')' """ # dopuszcza np zeros(4,5) - macierz prostokątna
+
+
+def p_matrix_function(p):
+    """matrix_func : EYE
+                    | ONES
+                    | ZEROS """
+
+
+def p_vector(p):
+    """vector : '[' objects ']' """
 
 
 parser = yacc.yacc()
