@@ -6,7 +6,8 @@ tokens = scanner.tokens
 precedence = (
     ('nonassoc', 'IFX'),
     ('nonassoc', 'ELSE'),
-    ('nonassoc', '=', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
+    ('right', '='),
+    ('nonassoc', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
     ('nonassoc', '<', '>', 'LESSEQUAL', 'GREATEREQUAL', 'EQUAL', 'NOTEQUAL'),
     ("left", '+', '-'),
     ("left", "DOTADD", "DOTSUB"),
@@ -24,26 +25,16 @@ def p_error(p):
 
 
 def p_program(p):
-    """ program : instructions_opt """
+    """ program : instructions
+                | """
+
+def p_instructions(p):
+    """ instructions : instructions instruction
+                    | instruction """
 
 
-def p_instructions_opt_1(p):
-    """ instructions_opt : instructions """
 
-
-def p_instructions_opt_2(p):
-    """ instructions_opt : """
-
-
-def p_instructions_1(p):
-    """ instructions : instructions instruction """
-
-
-def p_instructions_2(p):
-    """ instructions : instruction """
-
-
-def p_instruction(p):   # wszystkie reserved ze skanera, w assign bedzie eye, zeros, ones
+def p_instruction(p):
     """ instruction : block
                     | if
                     | for
@@ -69,7 +60,7 @@ def p_for(p):
 
 
 def p_range(p):
-    """ range : object ':' object"""
+    """ range : expression ':' expression """
 
 
 def p_while(p):
@@ -77,117 +68,125 @@ def p_while(p):
 
 
 def p_break(p):
-    """ break : BREAK ';'"""
+    """ break : BREAK ';' """
 
 
 def p_continue(p):
-    """ continue : CONTINUE ';'"""
+    """ continue : CONTINUE ';' """
 
 
 def p_return(p):
     """ return : RETURN ';'
-               | RETURN object ';' """
+               | RETURN expression ';' """
 
 
 def p_print(p):
-    """ print : PRINT objects ';' """
+    """ print : PRINT expressions ';' """
 
 
-def p_objects_singular(p):
-    """ objects : object """
+def p_expressions(p):
+    """ expressions : expressions ',' expression
+                    | expression """
+def p_type(p):
+    """ type : STRING
+             | number """
+
+def p_number(p):
+    """ number : INTEGER
+               | FLOAT """
 
 
-def p_objects_plural(p):
-    """ objects : object ',' objects  """
+def p_expression(p):
+    """ expression : type
+               | vector
+               | matrix
+               | variable """
+
+def p_numbers(p):
+    """ numbers : numbers ',' number
+                | number """
 
 
-def p_object(p):    # bedzie modyfikowane lub dodane zostana produkcje (matrix itp.) -> zamiast matrix zrobiłem vector
-    # vector może przejść taką drogę do matrix: vector -> [objects] -> [object, object, object] -> [vector, vector, vector] ->
-    # -> [[objects], [objects], [objects]] itd
-    """ object : STRING
-               | INTEGER
-               | FLOAT
-               | expression
-               | lvalue
-               | vector"""
+def p_vector(p):
+    """ vector : '[' numbers ']' """
+
+
+def p_vectors(p):
+    """ vectors : vectors ',' vector
+                    | vector """
+
+
+def p_matrix(p):
+    """ matrix : '[' vectors ']' """
+
+
 
 
 def p_assign(p):    # do zrobienia funkcja i cale drzewo - chyba jest OK
-    """ assign : lvalue '=' object ';'
-                | lvalue calculation_assign object ';' """
+    """ assign : variable '=' expression ';'
+               | variable calculation_assign expression ';' """
 
 
 def p_calculation_assign(p):
     """ calculation_assign : ADDASSIGN
-                            | SUBASSIGN
-                            | MULASSIGN
-                            | DIVASSIGN """
+                           | SUBASSIGN
+                           | MULASSIGN
+                           | DIVASSIGN """
 
 
-def p_lvalue(p):
-    """ lvalue : ID
-                | ID '[' INTEGER ']'
-                | ID '[' INTEGER ',' INTEGER ']' """
-
-
-def p_condition(p):
-    """ condition : object comparator object """
-
+def p_variable(p):
+    """ variable : ID
+               | ID '[' INTEGER ']'
+               | ID '[' INTEGER ',' INTEGER ']' """
 
 def p_comparator(p):
     """ comparator : '<'
-                  | '>'
-                  | EQUAL
-                  | NOTEQUAL
-                  | LESSEQUAL
-                  | GREATEREQUAL """
+                   | '>'
+                   | EQUAL
+                   | NOTEQUAL
+                   | LESSEQUAL
+                   | GREATEREQUAL """
 
-# WAŻNE: Nie wiem, które rozw. lepsze, bo mamy symbol object, który potrafi wywołać expression, więc można:
-# 1. przez object dostawać się do expression ponownie i wtedy object zawiera wszystkie typy (ID, STRING, matrix, etc)
-# 2. wszędzie na dole prawe strony object zmienić na expression i dodać p_expression_ID itd. , ale wtedy może być
-# redundancja bo mamy to w object
-# 3. Jakieś inne rozw.
+
+def p_condition(p):
+    """ condition : expression comparator expression """
 
 
 def p_expression_binop(p):
-    """expression  : object '+' object
-                | object '-' object
-                | object '*' object
-                | object '/' object"""
+    """ expression : expression '+' expression
+                   | expression '-' expression
+                   | expression '*' expression
+                   | expression '/' expression """
 
 
 def p_expression_matrixop(p):
-    """expression : object DOTADD object
-                    | object DOTSUB object
-                    | object DOTMUL object
-                    | object DOTDIV object"""
+    """ expression : expression DOTADD expression
+                    | expression DOTSUB expression
+                    | expression DOTMUL expression
+                    | expression DOTDIV expression """
 
 
 def p_expression_uminus(p):
-    """expression : '-' object %prec UMINUS"""
+    """ expression : '-' expression %prec UMINUS """
 
 
 def p_expression_parentheses(p):
-    """expression : '(' object ')'"""
+    """ expression : '(' expression ')' """
 
 
 def p_expression_transpose(p):
-    """expression : object "'" """
+    """ expression : expression "'" """
 
 
 def p_expression_matrix_functions(p):
-    """expression : matrix_func '(' object ')' 
-              | matrix_func '(' object ',' object ')' """ # dopuszcza np zeros(4,5) - macierz prostokątna
+    """ expression : matrix_func '(' INTEGER ')' 
+                   | matrix_func '(' INTEGER ',' INTEGER ')' """ # dopuszcza np zeros(4,5) - macierz prostokątna
 
 
 def p_matrix_function(p):
-    """matrix_func : EYE
+    """ matrix_func : EYE
                     | ONES
                     | ZEROS """
-
-
-def p_vector(p):
-    """vector : '[' objects ']' """
 
 
 parser = yacc.yacc()
