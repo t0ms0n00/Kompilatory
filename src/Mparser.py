@@ -28,10 +28,10 @@ def p_program(p):
     """ program : instructions
                 | """
 
+
 def p_instructions(p):
     """ instructions : instructions instruction
                     | instruction """
-
 
 
 def p_instruction(p):
@@ -87,9 +87,12 @@ def p_print(p):
 def p_expressions(p):
     """ expressions : expressions ',' expression
                     | expression """
+
+
 def p_type(p):
     """ type : STRING
              | number """
+
 
 def p_number(p):
     """ number : INTEGER
@@ -101,6 +104,7 @@ def p_expression(p):
                | vector
                | matrix
                | variable """
+
 
 def p_numbers(p):
     """ numbers : numbers ',' number
@@ -120,8 +124,6 @@ def p_matrix(p):
     """ matrix : '[' vectors ']' """
 
 
-
-
 def p_assign(p):    # do zrobienia funkcja i cale drzewo - chyba jest OK
     """ assign : variable '=' expression ';'
                | variable calculation_assign expression ';' """
@@ -138,6 +140,7 @@ def p_variable(p):
     """ variable : ID
                | ID '[' INTEGER ']'
                | ID '[' INTEGER ',' INTEGER ']' """
+
 
 def p_comparator(p):
     """ comparator : '<'
