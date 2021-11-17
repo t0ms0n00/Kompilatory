@@ -1,7 +1,5 @@
 # control flow instruction
 
-print 3.0-9.9;
-
 N = 10;
 M = 20;
 

@@ -6,8 +6,7 @@ tokens = scanner.tokens
 precedence = (
     ('nonassoc', 'IFX'),
     ('nonassoc', 'ELSE'),
-    ('right', '='),
-    ('nonassoc', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
+    ('nonassoc', '=', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
     ('nonassoc', '<', '>', 'LESSEQUAL', 'GREATEREQUAL', 'EQUAL', 'NOTEQUAL'),
     ("left", '+', '-'),
     ("left", "DOTADD", "DOTSUB"),

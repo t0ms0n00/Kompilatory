@@ -40,7 +40,7 @@ t_ignore = '  \t'
 
 def t_STRING(t):        # dopisać cytowania możliwe w stringu - DONE za pomoca \"
     r'"([^"]|\\")*[^\\]"'        # nie uwzglednia wcale stringow ''
-    t.value = str(t.value).replace("\\\"", "\"")        # usuwa \ z \"
+    t.value = str(t.value).replace("\\\"", "\"")      # usuwa \ z \"
     return t
 
 
