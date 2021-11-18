@@ -1,5 +1,6 @@
 import scanner
 import ply.yacc as yacc
+import AST
 
 tokens = scanner.tokens
 
@@ -159,6 +160,7 @@ def p_expression_binop(p):
                    | expression '-' expression
                    | expression '*' expression
                    | expression '/' expression """
+    p[0] = AST.BinExpr(p[2], p[1], p[3])
 
 
 def p_expression_matrixop(p):

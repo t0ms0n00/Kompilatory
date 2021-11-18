@@ -38,8 +38,8 @@ t_EQUAL = r'=='
 t_ignore = '  \t'
 
 
-def t_STRING(t):        # dopisać cytowania możliwe w stringu - DONE za pomoca \"
-    r'"([^"]|\\")*[^\\]"'        # nie uwzglednia wcale stringow ''
+def t_STRING(t):
+    r'"([^"]|\\")*[^\\]"'       
     t.value = str(t.value).replace("\\\"", "\"")      # usuwa \ z \"
     return t
 

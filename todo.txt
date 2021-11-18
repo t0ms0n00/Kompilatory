@@ -1,10 +1,9 @@
-sprawdzić czy cytowanie w STRING jest ok                                # chyba DONE
-wyrażenia binarne, w tym operacje macierzowe 'element po elemencie'
+wyrażenia binarne,
 wyrażenia relacyjne,
-negację unarną,
-transpozycję macierzy,
-inicjalizację macierzy konkretnymi wartościami,
-macierzowe funkcje specjalne,
-instrukcję przypisania, w tym różne operatory przypisania
+instrukcje przypisania,
+instrukcje warunkowe if-else,
+pętle: while oraz for,
+instrukcje break, continue oraz return,
+instrukcje print,
 instrukcje złożone,
 tablice oraz ich zakresy.
