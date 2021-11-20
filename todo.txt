@@ -1,9 +1,9 @@
 wyrażenia binarne,
-wyrażenia relacyjne,
-instrukcje przypisania,
-instrukcje warunkowe if-else,
+wyrażenia relacyjne,  -> Done, jeśli były tylko w condition
+instrukcje przypisania, -> Done
+instrukcje warunkowe if-else,   -> Done
 pętle: while oraz for,
-instrukcje break, continue oraz return,
+instrukcje break, continue oraz return, -> break, continue Done
 instrukcje print,
-instrukcje złożone,
-tablice oraz ich zakresy.
+instrukcje złożone,     -> Block i Instructions -> done
+tablice oraz ich zakresy. -> Done

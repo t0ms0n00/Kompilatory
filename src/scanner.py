@@ -39,7 +39,7 @@ t_ignore = '  \t'
 
 
 def t_STRING(t):
-    r'"([^"]|\\")*[^\\]"'       
+    r'"(\\"|[^"])*"'
     t.value = str(t.value).replace("\\\"", "\"")      # usuwa \ z \"
     return t
 

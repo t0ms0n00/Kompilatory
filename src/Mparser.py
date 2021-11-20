@@ -27,11 +27,19 @@ def p_error(p):
 def p_program(p):
     """ program : instructions
                 | """
+    if len(p) == 2:
+        p[0] = AST.Program(p[1])
+    else:
+        p[0] = AST.Program([])
 
 
 def p_instructions(p):
     """ instructions : instructions instruction
                     | instruction """
+    if len(p) == 3:
+        p[0] = AST.Instructions(p[1], p[2])
+    else:
+        p[0] = AST.Instruction(p[1])
 
 
 def p_instruction(p):
@@ -44,15 +52,21 @@ def p_instruction(p):
                     | return
                     | print
                     | assign """
+    p[0] = AST.Instruction(p[1])
 
 
 def p_block(p):
     """ block : '{' instructions '}' """
+    p[0] = AST.Block(p[2])
 
 
 def p_if(p):
     """ if : IF '(' condition ')' instruction %prec IFX
            | IF '(' condition ')' instruction ELSE instruction """
+    if len(p) == 6:
+        p[0] = AST.If(p[3], p[5])
+    else:
+        p[0] = AST.If(p[3], p[5], p[7])
 
 
 def p_for(p):
@@ -69,10 +83,12 @@ def p_while(p):
 
 def p_break(p):
     """ break : BREAK ';' """
+    p[0] = AST.Break()
 
 
 def p_continue(p):
     """ continue : CONTINUE ';' """
+    p[0] = AST.Continue()
 
 
 def p_return(p):
@@ -92,11 +108,13 @@ def p_expressions(p):
 def p_type(p):
     """ type : STRING
              | number """
+    p[0] = AST.Type(p[1])
 
 
 def p_number(p):
     """ number : INTEGER
                | FLOAT """
+    p[0] = AST.Number(p[1])
 
 
 def p_expression(p):
@@ -104,6 +122,7 @@ def p_expression(p):
                | vector
                | matrix
                | variable """
+    p[0] = AST.Expr(p[1])
 
 
 def p_numbers(p):
@@ -127,6 +146,7 @@ def p_matrix(p):
 def p_assign(p):    # do zrobienia funkcja i cale drzewo - chyba jest OK
     """ assign : variable '=' expression ';'
                | variable calculation_assign expression ';' """
+    p[0] = AST.Assign(p[2], p[1], p[3])
 
 
 def p_calculation_assign(p):
@@ -134,12 +154,19 @@ def p_calculation_assign(p):
                            | SUBASSIGN
                            | MULASSIGN
                            | DIVASSIGN """
+    p[0] = AST.CalcAssign(p[1])
 
 
 def p_variable(p):
     """ variable : ID
                | ID '[' INTEGER ']'
                | ID '[' INTEGER ',' INTEGER ']' """
+    if len(p) == 2:
+        p[0] = AST.Variable(p[1])
+    elif len(p) == 5:
+        p[0] = AST.Variable(p[1], p[3])
+    else:
+        p[0] = AST.Variable(p[1], p[3], p[5])
 
 
 def p_comparator(p):
@@ -149,10 +176,12 @@ def p_comparator(p):
                    | NOTEQUAL
                    | LESSEQUAL
                    | GREATEREQUAL """
+    p[0] = AST.Comparator(p[1])
 
 
 def p_condition(p):
     """ condition : expression comparator expression """
+    p[0] = AST.Condition(p[2], p[1], p[3])
 
 
 def p_expression_binop(p):
@@ -160,7 +189,6 @@ def p_expression_binop(p):
                    | expression '-' expression
                    | expression '*' expression
                    | expression '/' expression """
-    p[0] = AST.BinExpr(p[2], p[1], p[3])
 
 
 def p_expression_matrixop(p):
