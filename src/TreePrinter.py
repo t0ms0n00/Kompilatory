@@ -20,7 +20,10 @@ class TreePrinter:
 
     @addToClass(AST.Program)
     def printTree(self, indent=0):
-        self.instructions.printTree(indent)
+        if self.instructions is not None:
+            self.instructions.printTree(indent)
+        else:
+            print("Empty file.")
 
     @addToClass(AST.Instructions)
     def printTree(self, indent=0):
@@ -83,25 +86,48 @@ class TreePrinter:
         printWithIndent(indent, "PRINT")
         self.expressions.printTree(indent + 1)
 
+    @addToClass(AST.Expr)
+    def printTree(self, indent=0):
+        self.expression.printTree(indent)
+
     @addToClass(AST.Expressions)
     def printTree(self, indent=0):
         self.expressions.printTree(indent)
         self.expression.printTree(indent)
 
-    @addToClass(AST.Type)
+    @addToClass(AST.Singleton)
     def printTree(self, indent=0):
-        if self._type.__class__ == str:
-            printWithIndent(indent, self._type)
+        if self.singleton.__class__ == str:
+            printWithIndent(indent, self.singleton)
         else:
-            self._type.printTree(indent)
+            self.singleton.printTree(indent)
 
     @addToClass(AST.Number)
     def printTree(self, indent=0):
         printWithIndent(indent, str(self.value))
 
-    @addToClass(AST.Expr)
+
+    @addToClass(AST.Numbers)
     def printTree(self, indent=0):
-        self.expression.printTree(indent)
+        if self.numbers is not None:
+            self.numbers.printTree(indent)
+            self.number.printTree(indent)
+        elif self.number is not None:
+            self.number.printTree(indent)
+
+    @addToClass(AST.Vector)
+    def printTree(self, indent=0):
+        printWithIndent(indent, "VECTOR")
+        self.numbers.printTree(indent + 1)
+
+    @addToClass(AST.Vectors)
+    def printTree(self, indent=0):
+        self.vectors.printTree(indent)
+        self.vector.printTree(indent+1)
+
+    @addToClass(AST.Matrix)
+    def printTree(self, indent=0):
+        self.vectors.printTree(indent)
 
     @addToClass(AST.Assign)
     def printTree(self, indent=0):

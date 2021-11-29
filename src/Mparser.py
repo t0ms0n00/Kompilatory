@@ -30,12 +30,12 @@ def p_program(p):
     if len(p) == 2:
         p[0] = AST.Program(p[1])
     else:
-        p[0] = AST.Program([])
+        p[0] = AST.Program()
 
 
 def p_instructions(p):
     """ instructions : instructions instruction
-                    | instruction """
+                     | instruction """
     if len(p) == 3:
         p[0] = AST.Instructions(p[1], p[2])
     else:
@@ -105,6 +105,13 @@ def p_print(p):
     """ print : PRINT expressions ';' """
     p[0] = AST.Print(p[2])
 
+def p_expression(p):
+    """ expression : singleton
+                   | vector
+                   | matrix
+                   | variable """
+    p[0] = AST.Expr(p[1])
+
 def p_expressions(p):
     """ expressions : expressions ',' expression
                     | expression """
@@ -113,10 +120,11 @@ def p_expressions(p):
     else:
         p[0] = AST.Expr(p[1])
 
-def p_type(p):
-    """ type : STRING
-             | number """
-    p[0] = AST.Type(p[1])
+
+def p_singleton(p):
+    """ singleton : STRING
+                  | number """
+    p[0] = AST.Singleton(p[1])
 
 
 def p_number(p):
@@ -125,31 +133,32 @@ def p_number(p):
     p[0] = AST.Number(p[1])
 
 
-def p_expression(p):
-    """ expression : type
-               | vector
-               | matrix
-               | variable """
-    p[0] = AST.Expr(p[1])
-
-
-def p_numbers(p):
+def p_numbers(p): # dodac empty numbers
     """ numbers : numbers ',' number
-                | number """
-
+                | number
+                | """
+    if len(p) == 4:
+        p[0] = AST.Numbers(p[1], p[3])
+    elif len(p) == 2:
+        p[0] = AST.Number(p[1])
+    else:
+        p[0] = AST.Numbers()
 
 def p_vector(p):
     """ vector : '[' numbers ']' """
-
+    p[0] = AST.Vector(p[2])
 
 def p_vectors(p):
     """ vectors : vectors ',' vector
                 | vector """
-
+    if len(p) == 4:
+        p[0] = AST.Vectors(p[1], p[3])
+    else:
+        p[0] = AST.Vector(p[1])
 
 def p_matrix(p):
     """ matrix : '[' vectors ']' """
-
+    p[0] = AST.Matrix(p[2])
 
 def p_assign(p):
     """ assign : variable '=' expression ';'

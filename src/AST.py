@@ -4,37 +4,28 @@ from typing import Any
 class Node(object):
     pass
 
-
 @dataclass
 class Program(Node):
+    instructions: Any = None
+
+@dataclass
+class Instructions(Node):
+    instructions: Any
+    instruction: Any = None
+
+@dataclass
+class Instruction(Node):
+    instruction: Any
+
+@dataclass
+class Block(Node):
     instructions: Any
 
-# class Program(Node):
-#     def __init__(self, instructions):
-#         self.instructions = instructions
-
-
-class Instructions(Node):
-    def __init__(self, instructions, instruction=None):
-        self.instructions = instructions
-        self.instruction = instruction
-
-
-class Instruction(Node):
-    def __init__(self, instruction):
-        self.instruction = instruction
-
-
-class Block(Node):
-    def __init__(self, instructions):
-        self.instructions = instructions
-
-
+@dataclass
 class If(Node):
-    def __init__(self, condition, then_instr, else_instr=None):
-        self.condition = condition
-        self.then_instr = then_instr
-        self.else_instr = else_instr
+    condition: Any
+    then_instr: Any
+    else_instr: Any = None
 
 
 class For(Node):
@@ -43,57 +34,69 @@ class For(Node):
         self.range = in_range
         self.instruction = do_instr
 
-
+@dataclass
 class Range(Node):
-    def __init__(self, from_value, to_value):
-        self.from_value = from_value
-        self.to_value = to_value
+    from_value: Any
+    to_value: Any
 
-
+@dataclass
 class While(Node):
-    def __init__(self, condition, do_instr):
-        self.condition = condition
-        self.instruction = do_instr
+    condition: Any
+    instruction: Any
 
-
+@dataclass
 class Break(Node):
-    def __init__(self):
-        pass
+    pass
 
-
+@dataclass
 class Continue(Node):
-    def __init__(self):
-        pass
+    pass
 
-
+@dataclass
 class Return(Node):
-    def __init__(self, value = None):
-        self.value = value
+    value: Any = None
 
-
+@dataclass
 class Print(Node):
-    def __init__(self, expressions):
-        self.expressions = expressions
+    expressions: Any
 
-class Expressions(Node):
-    def __init__(self, expressions, expression=None):
-        self.expressions = expressions
-        self.expression = expression
-
-class Type(Node):
-    def __init__(self, _type):
-        self._type = _type
-
-
-class Number(Node):
-    def __init__(self, value):
-        self.value = value
-
-
+@dataclass
 class Expr(Node):
-    def __init__(self, expression):
-        self.expression = expression
+    expression: Any
 
+@dataclass
+class Expressions(Node):
+    expressions: Any
+    expression: Any = None
+
+
+@dataclass
+class Singleton(Node):
+    singleton: Any
+
+@dataclass
+class Number(Node):
+    value: int or float
+    def __str__(self): return str(self.value)
+
+
+@dataclass
+class Numbers(Node):
+    numbers: Any = None
+    number: Any = None
+
+@dataclass
+class Vector(Node):
+    numbers: Any
+
+@dataclass
+class Vectors(Node):
+    vectors: Any
+    vector: Any = None
+
+@dataclass
+class Matrix(Node):
+    vectors: Any
 
 class Assign(Node):
     def __init__(self, assignOp, var, expr):
@@ -106,26 +109,22 @@ class CalcAssign(Node):
     def __init__(self, assignOp):
         self.operator = assignOp
 
-
+@dataclass
 class Variable(Node):
-    def __init__(self, name, index1=None, index2=None):
-        self.name = name
-        self.index1 = index1
-        self.index2 = index2
+    name: Any
+    index1: Any = None
+    index2: Any = None
 
-
+@dataclass
 class Comparator(Node):
-    def __init__(self, comparator):
-        self.comparator = comparator
+    comparator: Any
 
-
+@dataclass
 class Condition(Node):
-    def __init__(self, comparator, left, right):
-        self.comparator = comparator
-        self.left = left
-        self.right = right
+    comparator: Any
+    left: Any
+    right: Any
 
-
+@dataclass
 class Error(Node):
-    def __init__(self):
-        pass
+    pass
