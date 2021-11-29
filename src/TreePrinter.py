@@ -14,7 +14,6 @@ def printWithIndent(indent, value):
 
 
 class TreePrinter:
-
     @addToClass(AST.Node)
     def printTree(self, indent=0):
         raise Exception("printTree not defined in class " + self.__class__.__name__)
@@ -46,6 +45,25 @@ class TreePrinter:
             printWithIndent(indent, "ELSE")
             self.else_instr.printTree(indent+1)
 
+    @addToClass(AST.For)
+    def printTree(self, indent=0):
+        printWithIndent(indent, "FOR")
+        printWithIndent(indent + 1, str(self.variable))
+        self.range.printTree(indent + 1)
+        self.instruction.printTree(indent + 1)
+
+    @addToClass(AST.Range)
+    def printTree(self, indent=0):
+        printWithIndent(indent, "RANGE")
+        self.from_value.printTree(indent + 1)
+        self.to_value.printTree(indent + 1)
+
+    @addToClass(AST.While)
+    def printTree(self, indent=0):
+        printWithIndent(indent, "WHILE")
+        self.condition.printTree(indent + 1)
+        self.instruction.printTree(indent + 1)
+
     @addToClass(AST.Break)
     def printTree(self, indent=0):
         printWithIndent(indent, self.__class__.__name__.upper())
@@ -53,6 +71,22 @@ class TreePrinter:
     @addToClass(AST.Continue)
     def printTree(self, indent=0):
         printWithIndent(indent, self.__class__.__name__.upper())
+
+    @addToClass(AST.Return)
+    def printTree(self, indent = 0):
+        printWithIndent(indent, "RETURN")
+        if self.value is not None:
+            self.value.printTree(indent + 1)
+
+    @addToClass(AST.Print)
+    def printTree(self, indent=0):
+        printWithIndent(indent, "PRINT")
+        self.expressions.printTree(indent + 1)
+
+    @addToClass(AST.Expressions)
+    def printTree(self, indent=0):
+        self.expressions.printTree(indent)
+        self.expression.printTree(indent)
 
     @addToClass(AST.Type)
     def printTree(self, indent=0):

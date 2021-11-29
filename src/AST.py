@@ -1,10 +1,17 @@
+from dataclasses import dataclass
+from typing import Any
+
 class Node(object):
     pass
 
 
+@dataclass
 class Program(Node):
-    def __init__(self, instructions):
-        self.instructions = instructions
+    instructions: Any
+
+# class Program(Node):
+#     def __init__(self, instructions):
+#         self.instructions = instructions
 
 
 class Instructions(Node):
@@ -30,6 +37,25 @@ class If(Node):
         self.else_instr = else_instr
 
 
+class For(Node):
+    def __init__(self, iter_var, in_range, do_instr):
+        self.variable = iter_var
+        self.range = in_range
+        self.instruction = do_instr
+
+
+class Range(Node):
+    def __init__(self, from_value, to_value):
+        self.from_value = from_value
+        self.to_value = to_value
+
+
+class While(Node):
+    def __init__(self, condition, do_instr):
+        self.condition = condition
+        self.instruction = do_instr
+
+
 class Break(Node):
     def __init__(self):
         pass
@@ -39,6 +65,20 @@ class Continue(Node):
     def __init__(self):
         pass
 
+
+class Return(Node):
+    def __init__(self, value = None):
+        self.value = value
+
+
+class Print(Node):
+    def __init__(self, expressions):
+        self.expressions = expressions
+
+class Expressions(Node):
+    def __init__(self, expressions, expression=None):
+        self.expressions = expressions
+        self.expression = expression
 
 class Type(Node):
     def __init__(self, _type):

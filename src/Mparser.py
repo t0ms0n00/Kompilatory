@@ -71,15 +71,17 @@ def p_if(p):
 
 def p_for(p):
     """ for : FOR ID '=' range instruction """
+    p[0] = AST.For(p[2], p[4], p[5])
 
 
 def p_range(p):
     """ range : expression ':' expression """
+    p[0] = AST.Range(p[1], p[3])
 
 
 def p_while(p):
     """ while : WHILE '(' condition ')' instruction """
-
+    p[0] = AST.While(p[3], p[5])
 
 def p_break(p):
     """ break : BREAK ';' """
@@ -94,16 +96,22 @@ def p_continue(p):
 def p_return(p):
     """ return : RETURN ';'
                | RETURN expression ';' """
-
+    if len(p) == 3:
+        p[0] = AST.Return()
+    else:
+        p[0] = AST.Return(p[2])
 
 def p_print(p):
     """ print : PRINT expressions ';' """
-
+    p[0] = AST.Print(p[2])
 
 def p_expressions(p):
     """ expressions : expressions ',' expression
                     | expression """
-
+    if len(p) == 4:
+        p[0] = AST.Expressions(p[1], p[3])
+    else:
+        p[0] = AST.Expr(p[1])
 
 def p_type(p):
     """ type : STRING
@@ -136,14 +144,14 @@ def p_vector(p):
 
 def p_vectors(p):
     """ vectors : vectors ',' vector
-                    | vector """
+                | vector """
 
 
 def p_matrix(p):
     """ matrix : '[' vectors ']' """
 
 
-def p_assign(p):    # do zrobienia funkcja i cale drzewo - chyba jest OK
+def p_assign(p):
     """ assign : variable '=' expression ';'
                | variable calculation_assign expression ';' """
     p[0] = AST.Assign(p[2], p[1], p[3])
@@ -193,9 +201,9 @@ def p_expression_binop(p):
 
 def p_expression_matrixop(p):
     """ expression : expression DOTADD expression
-                    | expression DOTSUB expression
-                    | expression DOTMUL expression
-                    | expression DOTDIV expression """
+                   | expression DOTSUB expression
+                   | expression DOTMUL expression
+                   | expression DOTDIV expression """
 
 
 def p_expression_uminus(p):
