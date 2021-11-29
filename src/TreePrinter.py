@@ -106,7 +106,6 @@ class TreePrinter:
     def printTree(self, indent=0):
         printWithIndent(indent, str(self.value))
 
-
     @addToClass(AST.Numbers)
     def printTree(self, indent=0):
         if self.numbers is not None:
@@ -162,6 +161,45 @@ class TreePrinter:
         self.comparator.printTree(indent)
         self.left.printTree(indent+1)
         self.right.printTree(indent+1)
+
+    @addToClass(AST.BinOp)
+    def printTree(self, indent=0):
+        printWithIndent(indent, str(self.operator))
+        self.left.printTree(indent+1)
+        self.right.printTree(indent+1)
+
+    @addToClass(AST.MatrixOp)
+    def printTree(self, indent=0):
+        printWithIndent(indent, str(self.operator))
+        self.left.printTree(indent + 1)
+        self.right.printTree(indent + 1)
+
+    @addToClass(AST.UMinus)
+    def printTree(self, indent=0):
+        printWithIndent(indent, '-')
+        self.expression.printTree(indent + 1)
+
+    @addToClass(AST.Parentheses)        # czy wypisywać nawiasy czy samo wyrażenie w nich?
+    def printTree(self, indent=0):
+        printWithIndent(indent, '(')
+        self.expression.printTree(indent + 1)
+        printWithIndent(indent, ')')
+
+    @addToClass(AST.Transpose)
+    def printTree(self, indent=0):
+        printWithIndent(indent, 'TRANSPOSE')
+        self.expression.printTree(indent + 1)
+
+    @addToClass(AST.MatrixFunc)
+    def printTree(self, indent=0):
+        self.func.printTree(indent)
+        printWithIndent(indent+1, str(self.dim1))
+        if self.dim2 is not None:
+            printWithIndent(indent+1, str(self.dim2))
+
+    @addToClass(AST.Function)
+    def printTree(self, indent=0):
+        printWithIndent(indent, self.func)
 
     @addToClass(AST.Error)
     def printTree(self, indent=0):

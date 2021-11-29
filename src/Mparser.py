@@ -83,6 +83,7 @@ def p_while(p):
     """ while : WHILE '(' condition ')' instruction """
     p[0] = AST.While(p[3], p[5])
 
+
 def p_break(p):
     """ break : BREAK ';' """
     p[0] = AST.Break()
@@ -101,9 +102,11 @@ def p_return(p):
     else:
         p[0] = AST.Return(p[2])
 
+
 def p_print(p):
     """ print : PRINT expressions ';' """
     p[0] = AST.Print(p[2])
+
 
 def p_expression(p):
     """ expression : singleton
@@ -111,6 +114,7 @@ def p_expression(p):
                    | matrix
                    | variable """
     p[0] = AST.Expr(p[1])
+
 
 def p_expressions(p):
     """ expressions : expressions ',' expression
@@ -144,9 +148,11 @@ def p_numbers(p): # dodac empty numbers
     else:
         p[0] = AST.Numbers()
 
+
 def p_vector(p):
     """ vector : '[' numbers ']' """
     p[0] = AST.Vector(p[2])
+
 
 def p_vectors(p):
     """ vectors : vectors ',' vector
@@ -156,9 +162,11 @@ def p_vectors(p):
     else:
         p[0] = AST.Vector(p[1])
 
+
 def p_matrix(p):
     """ matrix : '[' vectors ']' """
     p[0] = AST.Matrix(p[2])
+
 
 def p_assign(p):
     """ assign : variable '=' expression ';'
@@ -206,6 +214,7 @@ def p_expression_binop(p):
                    | expression '-' expression
                    | expression '*' expression
                    | expression '/' expression """
+    p[0] = AST.BinOp(p[2], p[1], p[3])
 
 
 def p_expression_matrixop(p):
@@ -213,29 +222,38 @@ def p_expression_matrixop(p):
                    | expression DOTSUB expression
                    | expression DOTMUL expression
                    | expression DOTDIV expression """
+    p[0] = AST.MatrixOp(p[2], p[1], p[3])
 
 
 def p_expression_uminus(p):
     """ expression : '-' expression %prec UMINUS """
+    p[0] = AST.UMinus(p[2])
 
 
 def p_expression_parentheses(p):
     """ expression : '(' expression ')' """
+    p[0] = AST.Parentheses(p[2])
 
 
 def p_expression_transpose(p):
     """ expression : expression "'" """
+    p[0] = AST.Transpose(p[1])
 
 
 def p_expression_matrix_functions(p):
     """ expression : matrix_func '(' INTEGER ')' 
                    | matrix_func '(' INTEGER ',' INTEGER ')' """ # dopuszcza np zeros(4,5) - macierz prostokątna
+    if len(p) == 5:
+        p[0] = AST.MatrixFunc(p[1], p[3])
+    else:
+        p[0] = AST.MatrixFunc(p[1], p[3], p[5])
 
 
 def p_matrix_function(p):
     """ matrix_func : EYE
                     | ONES
                     | ZEROS """
+    p[0] = AST.Function(p[1])
 
 
 parser = yacc.yacc()
