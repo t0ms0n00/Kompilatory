@@ -91,13 +91,12 @@ class Singleton(Node):
 @dataclass
 class Number(Node):
     value: int or float
-    def __str__(self): return str(self.value)
 
 
 @dataclass
 class Numbers(Node):
-    numbers: Any = None
     number: Any = None
+    numbers: Any = None
 
 
 @dataclass
@@ -107,8 +106,8 @@ class Vector(Node):
 
 @dataclass
 class Vectors(Node):
-    vectors: Any
-    vector: Any = None
+    vector: Any
+    vectors: Any = None
 
 
 @dataclass

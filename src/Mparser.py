@@ -142,9 +142,9 @@ def p_numbers(p): # dodac empty numbers
                 | number
                 | """
     if len(p) == 4:
-        p[0] = AST.Numbers(p[1], p[3])
+        p[0] = AST.Numbers(p[3], p[1])
     elif len(p) == 2:
-        p[0] = AST.Number(p[1])
+        p[0] = AST.Numbers(p[1])
     else:
         p[0] = AST.Numbers()
 
@@ -158,9 +158,9 @@ def p_vectors(p):
     """ vectors : vectors ',' vector
                 | vector """
     if len(p) == 4:
-        p[0] = AST.Vectors(p[1], p[3])
+        p[0] = AST.Vectors(p[3], p[1])
     else:
-        p[0] = AST.Vector(p[1])
+        p[0] = AST.Vectors(p[1])
 
 
 def p_matrix(p):

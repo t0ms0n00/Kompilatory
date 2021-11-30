@@ -69,14 +69,14 @@ class TreePrinter:
 
     @addToClass(AST.Break)
     def printTree(self, indent=0):
-        printWithIndent(indent, self.__class__.__name__.upper())
+        printWithIndent(indent, "BREAK")
 
     @addToClass(AST.Continue)
     def printTree(self, indent=0):
-        printWithIndent(indent, self.__class__.__name__.upper())
+        printWithIndent(indent, "CONTINUE")
 
     @addToClass(AST.Return)
-    def printTree(self, indent = 0):
+    def printTree(self, indent=0):
         printWithIndent(indent, "RETURN")
         if self.value is not None:
             self.value.printTree(indent + 1)
