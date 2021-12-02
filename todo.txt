@@ -1,9 +1,0 @@
-wyrażenia binarne,
-wyrażenia relacyjne,  -> Done, jeśli były tylko w condition
-instrukcje przypisania, -> Done
-instrukcje warunkowe if-else,   -> Done
-pętle: while oraz for,      -> done
-instrukcje break, continue oraz return, -> break, continue Done
-instrukcje print,   -> done
-instrukcje złożone,     -> Block i Instructions -> done
-tablice oraz ich zakresy. -> Done
