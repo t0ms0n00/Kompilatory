@@ -19,7 +19,7 @@
 
 import sys
 import ply.yacc as yacc
-from Mparser import Mparser
+import Mparser
 from TreePrinter import TreePrinter
 from TypeChecker import TypeChecker
 

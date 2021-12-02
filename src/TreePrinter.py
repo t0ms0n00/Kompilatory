@@ -97,35 +97,23 @@ class TreePrinter:
 
     @addToClass(AST.Singleton)
     def printTree(self, indent=0):
-        if self.singleton.__class__ == str:
-            printWithIndent(indent, self.singleton)
-        else:
-            self.singleton.printTree(indent)
-
-    @addToClass(AST.Number)
-    def printTree(self, indent=0):
-        printWithIndent(indent, str(self.value))
-
-    @addToClass(AST.Numbers)
-    def printTree(self, indent=0):
-        if self.numbers is not None:
-            self.numbers.printTree(indent)
-            self.number.printTree(indent)
-        elif self.number is not None:
-            self.number.printTree(indent)
+        printWithIndent(indent, str(self.singleton))
 
     @addToClass(AST.Vector)
     def printTree(self, indent=0):
         printWithIndent(indent, "VECTOR")
-        self.numbers.printTree(indent + 1)
+        if self.expressions is not None:
+            self.expressions.printTree(indent + 1)
 
     @addToClass(AST.Vectors)
     def printTree(self, indent=0):
-        self.vectors.printTree(indent)
+        if self.vectors is not None:
+            self.vectors.printTree(indent)
         self.vector.printTree(indent+1)
 
     @addToClass(AST.Matrix)
     def printTree(self, indent=0):
+        printWithIndent(indent, "VECTOR")
         self.vectors.printTree(indent)
 
     @addToClass(AST.Assign)
@@ -178,8 +166,9 @@ class TreePrinter:
     def printTree(self, indent=0):
         printWithIndent(indent, '-')
         self.expression.printTree(indent + 1)
+        # self.expression.printTree(indent)
 
-    @addToClass(AST.Parentheses)        # czy wypisywać nawiasy czy samo wyrażenie w nich?
+    @addToClass(AST.Parentheses)
     def printTree(self, indent=0):
         self.expression.printTree(indent)
 

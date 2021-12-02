@@ -29,5 +29,4 @@ class SymbolTable(object):
 
     def popScope(self):
         pass
-    #
 
