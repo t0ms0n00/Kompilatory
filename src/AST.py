@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Any
 
-
 class Node(object):
     pass
 
@@ -90,8 +89,19 @@ class Singleton(Node):
 
 
 @dataclass
+class Number(Node):
+    value: int or float
+
+
+@dataclass
+class Numbers(Node):
+    number: Any = None
+    numbers: Any = None
+
+
+@dataclass
 class Vector(Node):
-    expressions: Any = None
+    numbers: Any
 
 
 @dataclass

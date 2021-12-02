@@ -127,18 +127,31 @@ def p_expressions(p):
 
 def p_singleton(p):
     """ singleton : STRING
-                  | INTEGER
-                  | FLOAT  """
+                  | number """
     p[0] = AST.Singleton(p[1])
 
 
-def p_vector(p):
-    """ vector : '[' expressions ']'
-                | '[' ']' """
+def p_number(p):
+    """ number : INTEGER
+               | FLOAT """
+    p[0] = AST.Number(p[1])
+
+
+def p_numbers(p): # dodac empty numbers
+    """ numbers : numbers ',' number
+                | number
+                | """
     if len(p) == 4:
-        p[0] = AST.Vector(p[2])
+        p[0] = AST.Numbers(p[3], p[1])
+    elif len(p) == 2:
+        p[0] = AST.Numbers(p[1])
     else:
-        p[0] = AST.Vector()
+        p[0] = AST.Numbers()
+
+
+def p_vector(p):
+    """ vector : '[' numbers ']' """
+    p[0] = AST.Vector(p[2])
 
 
 def p_vectors(p):
