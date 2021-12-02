@@ -168,10 +168,6 @@ class TreePrinter:
         self.expression.printTree(indent + 1)
         # self.expression.printTree(indent)
 
-    @addToClass(AST.Parentheses)
-    def printTree(self, indent=0):
-        self.expression.printTree(indent)
-
     @addToClass(AST.Transpose)
     def printTree(self, indent=0):
         printWithIndent(indent, 'TRANSPOSE')

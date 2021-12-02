@@ -219,7 +219,7 @@ def p_expression_uminus(p):
 
 def p_expression_parentheses(p):
     """ expression : '(' expression ')' """
-    p[0] = AST.Parentheses(p[2])
+    p[0] = p[2]
 
 
 def p_expression_transpose(p):

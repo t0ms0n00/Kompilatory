@@ -156,11 +156,6 @@ class UMinus(Node):
 
 
 @dataclass
-class Parentheses(Node):
-    expression: Any
-
-
-@dataclass
 class Transpose(Node):
     expression: Any
 
