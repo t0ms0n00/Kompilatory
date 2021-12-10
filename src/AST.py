@@ -14,7 +14,6 @@ class Program(Node):
 @dataclass
 class Instructions(Node):
     instructions: Any
-    instruction: Any = None
 
 
 @dataclass
@@ -81,7 +80,6 @@ class Expr(Node):
 @dataclass
 class Expressions(Node):
     expressions: Any
-    expression: Any = None
 
 
 @dataclass
@@ -96,8 +94,7 @@ class Vector(Node):
 
 @dataclass
 class Vectors(Node):
-    vector: Any
-    vectors: Any = None
+    vectors: Any
 
 
 @dataclass

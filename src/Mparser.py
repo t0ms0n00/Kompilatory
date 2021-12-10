@@ -37,9 +37,9 @@ def p_instructions(p):
     """ instructions : instructions instruction
                      | instruction """
     if len(p) == 3:
-        p[0] = AST.Instructions(p[1], p[2])
+        p[0] = AST.Instructions(p[1].instructions + [p[2]])
     else:
-        p[0] = AST.Instruction(p[1])
+        p[0] = AST.Instructions([p[1]])
 
 
 def p_instruction(p):
@@ -120,9 +120,9 @@ def p_expressions(p):
     """ expressions : expressions ',' expression
                     | expression """
     if len(p) == 4:
-        p[0] = AST.Expressions(p[1], p[3])
+        p[0] = AST.Expressions(p[1].expressions + [p[3]])
     else:
-        p[0] = AST.Expr(p[1])
+        p[0] = AST.Expressions([p[1]])
 
 
 def p_singleton(p):
@@ -145,9 +145,9 @@ def p_vectors(p):
     """ vectors : vectors ',' vector
                 | vector """
     if len(p) == 4:
-        p[0] = AST.Vectors(p[3], p[1])
+        p[0] = AST.Vectors(p[1].vectors + [p[3]])
     else:
-        p[0] = AST.Vectors(p[1])
+        p[0] = AST.Vectors([p[1]])
 
 
 def p_matrix(p):
@@ -228,7 +228,7 @@ def p_expression_transpose(p):
 
 
 def p_expression_matrix_functions(p):
-    """ expression : matrix_func '(' INTEGER ')' 
+    """ expression : matrix_func '(' INTEGER ')'
                    | matrix_func '(' INTEGER ',' INTEGER ')' """ # dopuszcza np zeros(4,5) - macierz prostokątna
     if len(p) == 5:
         p[0] = AST.MatrixFunc(p[1], p[3])

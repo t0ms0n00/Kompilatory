@@ -1,3 +1,6 @@
+import AST
+
+
 class NodeVisitor(object):
 
     def visit(self, node):
@@ -18,22 +21,14 @@ class NodeVisitor(object):
                 elif isinstance(child, AST.Node):
                     self.visit(child)
 
-    # simpler version of generic_visit, not so general
-    # def generic_visit(self, node):
-    #    for child in node.children:
-    #        self.visit(child)
-
 
 class TypeChecker(NodeVisitor):
 
+    def visit_Instructions(self, node):
+        pass
+
     def visit_BinExpr(self, node):
-        # alternative usage,
-        # requires definition of accept method in class Node
-        type1 = self.visit(node.left)  # type1 = node.left.accept(self)
-        type2 = self.visit(node.right)  # type2 = node.right.accept(self)
-        op = node.op
-        # ...
-        #
+        pass
 
     def visit_Variable(self, node):
         pass

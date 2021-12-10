@@ -1,3 +1,7 @@
+class Symbol:
+    pass
+
+
 class VariableSymbol(Symbol):
 
     def __init__(self, name, type):

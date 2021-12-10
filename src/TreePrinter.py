@@ -27,8 +27,8 @@ class TreePrinter:
 
     @addToClass(AST.Instructions)
     def printTree(self, indent=0):
-        self.instructions.printTree(indent)
-        self.instruction.printTree(indent)
+        for instruction in self.instructions:
+            instruction.printTree(indent)
 
     @addToClass(AST.Instruction)
     def printTree(self, indent=0):
@@ -92,8 +92,8 @@ class TreePrinter:
 
     @addToClass(AST.Expressions)
     def printTree(self, indent=0):
-        self.expressions.printTree(indent)
-        self.expression.printTree(indent)
+        for expr in self.expressions:
+            expr.printTree(indent)
 
     @addToClass(AST.Singleton)
     def printTree(self, indent=0):
@@ -107,9 +107,8 @@ class TreePrinter:
 
     @addToClass(AST.Vectors)
     def printTree(self, indent=0):
-        if self.vectors is not None:
-            self.vectors.printTree(indent)
-        self.vector.printTree(indent+1)
+        for vector in self.vectors:
+            vector.printTree(indent)
 
     @addToClass(AST.Matrix)
     def printTree(self, indent=0):
