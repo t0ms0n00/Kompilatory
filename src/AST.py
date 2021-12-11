@@ -3,7 +3,8 @@ from typing import Any
 
 
 class Node(object):
-    pass
+    def __init__(self):
+        self.lineno = 0
 
 
 @dataclass
