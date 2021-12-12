@@ -8,7 +8,14 @@ class VariableSymbol(Symbol):
         self.name = name
         self.type = type
 
-# matrix symbol
+
+class MatrixSymbol(Symbol):
+
+    def __init__(self, name, type, dim1, dim2=None):
+        self.name = name
+        self.type = type
+        self.dim1 = dim1
+        self.dim2 = dim2
 
 
 class SymbolTable(object):

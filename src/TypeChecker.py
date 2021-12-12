@@ -6,6 +6,7 @@ from OperationTypes import ttype
 class NodeVisitor(object):
 
     def __init__(self):
+        # na true w każdym błędzie przed PRINT
         self.error = False
 
     def visit(self, node):
@@ -114,14 +115,14 @@ class TypeChecker(NodeVisitor):
         return 'unknown'
 
     def visit_Vector(self, node):
-        pass
+        return 'vector'
 
     def visit_Vectors(self, node):
         for vector in node.vectors:
             self.visit(vector)
 
     def visit_Matrix(self, node):
-        pass
+        return 'matrix'
 
     def visit_Assign(self, node):
         #referencje!!!!
@@ -129,8 +130,10 @@ class TypeChecker(NodeVisitor):
             right = self.visit(node.expression)
             if right == 'unknown':
                 print("Line {}: Cannot assign unknown type to variable".format(node.lineno))
-            elif right == 'matrix' or right == 'vector':
-                pass        # macierze i wektory
+            elif right == 'vector':
+                pass
+            elif right == 'matrix':
+                pass
             else:
                 symbol = VariableSymbol(node.variable.name, right)
                 self.symbol_table.put(node.variable.name, symbol)
@@ -192,6 +195,7 @@ class TypeChecker(NodeVisitor):
 
     def visit_MatrixFunc(self, node):
         pass
+    # eye 2 wymiary
 
     def visit_Function(self, node):
         pass
