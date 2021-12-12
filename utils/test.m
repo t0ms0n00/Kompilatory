@@ -1,2 +1,6 @@
-a = [4,5,6];
-a = 3;
+break;
+
+continue;
+return;
+
+x = 1 + "b";

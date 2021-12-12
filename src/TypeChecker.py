@@ -85,11 +85,11 @@ class TypeChecker(NodeVisitor):
     def visit_Break(self, node):
         # linia-1 może zmienić
         if self.loop_depth == 0:
-            print("Line {}: Break outside the loop".format(node.lineno-1))
+            print("Line {}: Break outside the loop".format(node.lineno))
 
     def visit_Continue(self, node):
         if self.loop_depth == 0:
-            print("Line {}: Continue outside the loop".format(node.lineno-1))
+            print("Line {}: Continue outside the loop".format(node.lineno))
 
     def visit_Return(self, node):
         if node.value is not None:
