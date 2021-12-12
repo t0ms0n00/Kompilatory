@@ -10,6 +10,7 @@ class VariableSymbol(Symbol):
 
 # matrix symbol
 
+
 class SymbolTable(object):
 
     def __init__(self, parent, name): # parent scope and symbol table name

@@ -31,6 +31,7 @@ class TypeChecker(NodeVisitor):
 
     def __init__(self):
         self.symbol_table = SymbolTable(None, 'main')
+        self.loop_depth = 0
 
     def visit_Program(self, node):
         if node.instructions is not None:
@@ -64,25 +65,36 @@ class TypeChecker(NodeVisitor):
         pass
 
     def visit_While(self, node):
-        pass
+        self.symbol_table.pushScope('while')
+        self.loop_depth += 1
+        self.visit(node.condition)
+        self.visit(node.instruction)
+        self.loop_depth -= 1
+        self.symbol_table.popScope()
 
     def visit_Break(self, node):
-        pass
+        # linia-1 może zmienić
+        print(type(node), node.lineno)
+        if self.loop_depth == 0:
+            print("Line {}: Break outside the loop".format(node.lineno-1))
 
     def visit_Continue(self, node):
-        pass
+        if self.loop_depth == 0:
+            print("Line {}: Continue outside the loop".format(node.lineno-1))
 
     def visit_Return(self, node):
-        pass
+        if node.value is not None:
+            self.visit(node.value)
 
     def visit_Print(self, node):
-        pass
+        self.visit(node.expressions)
 
     def visit_Expr(self, node):
         return self.visit(node.expression)
 
     def visit_Expressions(self, node):
-        pass
+        for expression in node.expressions:
+            self.visit(expression)
 
     def visit_Singleton(self, node):
         if type(node.singleton) == str:
@@ -97,24 +109,23 @@ class TypeChecker(NodeVisitor):
         pass
 
     def visit_Vectors(self, node):
-        pass
+        for vector in node.vectors:
+            self.visit(vector)
 
     def visit_Matrix(self, node):
         pass
 
     def visit_Assign(self, node):
+        #referencje!!!!
         right = self.visit(node.expression)
         if right == 'unknown':
             print("Line {}: Cannot assign unknown type to variable".format(node.lineno))
         elif right == 'matrix' or right == 'vector':
             pass        # macierze i wektory
-        else:           # przemyśleć
+        else:
             symbol = VariableSymbol(node.variable.name, right)
-            name = self.get_variable_name(node.variable)
-            print(name)
             self.symbol_table.put(node.variable.name, symbol)
-        print(self.symbol_table.symbols.items())
-
+        # print(self.symbol_table.symbols.items())
 
     def visit_CalcAssign(self, node):
         pass
@@ -137,7 +148,15 @@ class TypeChecker(NodeVisitor):
         # czekamy co zwrócą powyższe
 
     def visit_BinOp(self, node):
-        pass
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        operator = node.operator
+
+        result_type = ttype[operator][left][right]
+        if result_type == 'unknown':
+            print('Line {}: Incompatible types {} and {} for operation {}'.format(node.lineno, left, right, operator))
+
+        return result_type
 
     def visit_MatrixOp(self, node):
         pass
@@ -153,11 +172,3 @@ class TypeChecker(NodeVisitor):
 
     def visit_Function(self, node):
         pass
-
-    def get_variable_name(self, variable):
-        name = variable.name
-        if variable.index1 is not None:
-            name += str(variable.index1)
-            if variable.index2 is not None:
-                name += str(variable.index2)
-        return name
