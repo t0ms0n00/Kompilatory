@@ -100,5 +100,5 @@ ttype['unary']['float'][None] = 'float'
 ttype['unary']['vector'][None] = 'vector'
 ttype['unary']['matrix'][None] = 'matrix'
 
-ttype['transpose']['vector'][None] = 'matrix'
+# ttype['transpose']['vector'][None] = 'matrix' # chyba bez sensu
 ttype['transpose']['matrix'][None] = 'matrix'

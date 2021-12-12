@@ -4,14 +4,7 @@ class Symbol:
 
 class VariableSymbol(Symbol):
 
-    def __init__(self, name, type):
-        self.name = name
-        self.type = type
-
-
-class MatrixSymbol(Symbol):
-
-    def __init__(self, name, type, dim1, dim2=None):
+    def __init__(self, name, type, dim1=None, dim2=None):
         self.name = name
         self.type = type
         self.dim1 = dim1

@@ -150,7 +150,7 @@ def p_singleton(p):
 
 def p_vector(p):
     """ vector : '[' expressions ']'
-                | '[' ']' """
+               | '[' ']' """
     if len(p) == 4:
         p[0] = AST.Vector(p[2])
     else:

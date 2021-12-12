@@ -115,6 +115,22 @@ class TypeChecker(NodeVisitor):
         return 'unknown'
 
     def visit_Vector(self, node):
+        # print("IN")
+        # print(node)
+        # print(node.expressions.expressions[0].expression)
+        # print(len(node.expressions.expressions))
+        expr_singletons = node.expressions.expressions
+        types_inside_vector = []
+        for expr_singleton in expr_singletons:
+            types_inside_vector.append(self.visit_Singleton(expr_singleton.expression))
+        bad_types_in_vector = False
+        for singleton_type in types_inside_vector:
+            if singleton_type == 'str' or singleton_type == 'unknown':
+                bad_types_in_vector = True
+                print("Line {}: Vector cannot have {} type inside".format(node.lineno, singleton_type))
+        if bad_types_in_vector:
+            return 'unknown'
+
         return 'vector'
 
     def visit_Vectors(self, node):
@@ -131,12 +147,25 @@ class TypeChecker(NodeVisitor):
             if right == 'unknown':
                 print("Line {}: Cannot assign unknown type to variable".format(node.lineno))
             elif right == 'vector':
-                pass
+                # print(node.expression)
+                # print(node.expression.expression)
+                # print(self.visit(node.expression.expression))
+                if self.visit_Vector(node.expression.expression) == 'vector':
+                    expr_singletons = node.expression.expression.expressions.expressions
+                    vector_length = len(expr_singletons)
+                    vector_type = 'int'
+                    for expr_singleton in expr_singletons:
+                        singleton_type = self.visit_Singleton(expr_singleton.expression)
+                        if singleton_type == 'float':
+                            vector_type = 'float'
+                    symbol = VariableSymbol(node.variable.name, vector_type, dim1=vector_length)
+                    self.symbol_table.put(node.variable.name, symbol)
             elif right == 'matrix':
                 pass
-            else:
+            else: # singleton
                 symbol = VariableSymbol(node.variable.name, right)
                 self.symbol_table.put(node.variable.name, symbol)
+
         else: # calc_assign
             operator = self.visit(node.operator)
             if self.visit(node.variable) is None:
@@ -153,7 +182,13 @@ class TypeChecker(NodeVisitor):
         return node.operator
 
     def visit_Variable(self, node):
-        return self.symbol_table.symbols[node.name].type
+        if self.symbol_table.symbols[node.name].dim2 is not None:
+            return 'matrix'
+        elif self.symbol_table.symbols[node.name].dim1 is not None:
+            return 'vector'
+        else:
+            singleton_type = self.symbol_table.symbols[node.name].type
+            return singleton_type
 
     def visit_Comparator(self, node):
         return node.comparator
