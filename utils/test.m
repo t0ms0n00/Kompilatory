@@ -1,2 +1,2 @@
-a = 2 + 4 + "ccc";
 a = 2;
+print -"skkka";

@@ -59,22 +59,30 @@ class TypeChecker(NodeVisitor):
             self.symbol_table.popScope()
 
     def visit_For(self, node):
-        pass
+        self.loop_depth += 1
+        result_type = self.visit(node.range)
+        if result_type != 'unknown':
+            symbol = VariableSymbol(node.variable, result_type)
+            self.symbol_table.put(node.variable, symbol)
+        self.visit(node.instruction)
+        self.loop_depth -= 1
 
     def visit_Range(self, node):
-        pass
+        left = self.visit(node.from_value)
+        right = self.visit(node.to_value)
+        if left != 'int' or right != 'int':
+            print("Line {}: Incompatible range types {} and {} for instruction for".format(node.lineno, left, right))
+            return 'unknown'
+        return 'int'
 
     def visit_While(self, node):
-        self.symbol_table.pushScope('while')
         self.loop_depth += 1
         self.visit(node.condition)
         self.visit(node.instruction)
         self.loop_depth -= 1
-        self.symbol_table.popScope()
 
     def visit_Break(self, node):
         # linia-1 może zmienić
-        print(type(node), node.lineno)
         if self.loop_depth == 0:
             print("Line {}: Break outside the loop".format(node.lineno-1))
 
@@ -117,21 +125,32 @@ class TypeChecker(NodeVisitor):
 
     def visit_Assign(self, node):
         #referencje!!!!
-        right = self.visit(node.expression)
-        if right == 'unknown':
-            print("Line {}: Cannot assign unknown type to variable".format(node.lineno))
-        elif right == 'matrix' or right == 'vector':
-            pass        # macierze i wektory
-        else:
-            symbol = VariableSymbol(node.variable.name, right)
-            self.symbol_table.put(node.variable.name, symbol)
-        # print(self.symbol_table.symbols.items())
+        if node.operator == "=":
+            right = self.visit(node.expression)
+            if right == 'unknown':
+                print("Line {}: Cannot assign unknown type to variable".format(node.lineno))
+            elif right == 'matrix' or right == 'vector':
+                pass        # macierze i wektory
+            else:
+                symbol = VariableSymbol(node.variable.name, right)
+                self.symbol_table.put(node.variable.name, symbol)
+        else: # calc_assign
+            operator = self.visit(node.operator)
+            if self.visit(node.variable) is None:
+                print("Line {}: Variable {} not defined".format(node.lineno, node.variable.name))
+                return 'unknown'
+            left = self.visit(node.variable)
+            right = self.visit(node.expression)
+            if right == 'unknown':
+                print("Line {}: Cannot assign unknown type to variable".format(node.lineno))
+            elif ttype[operator][left][right] == 'unknown':
+                print("Line {}: Incompatible assign operation types {} and {} for operator {}".format(node.lineno, left, right, operator))
 
     def visit_CalcAssign(self, node):
-        pass
+        return node.operator
 
     def visit_Variable(self, node):
-        pass
+        return self.symbol_table.symbols[node.name].type
 
     def visit_Comparator(self, node):
         return node.comparator
@@ -162,7 +181,11 @@ class TypeChecker(NodeVisitor):
         pass
 
     def visit_UMinus(self, node):
-        pass
+        expr_type = self.visit(node.expression)
+        if ttype['unary'][expr_type][None] == 'unknown':
+            print("Line {}: Unary minus cannot be before type {}".format(node.lineno, expr_type))
+            return 'unknown'
+        return ttype
 
     def visit_Transpose(self, node):
         pass
