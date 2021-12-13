@@ -124,7 +124,6 @@ def p_print(p):
 def p_expression(p):
     """ expression : singleton
                    | vector
-                   | matrix
                    | variable """
     p[0] = AST.Expr(p[1])
     p[0].lineno = scanner.lexer.lineno
@@ -155,22 +154,6 @@ def p_vector(p):
         p[0] = AST.Vector(p[2])
     else:
         p[0] = AST.Vector()
-    p[0].lineno = scanner.lexer.lineno
-
-
-def p_vectors(p):
-    """ vectors : vectors ',' vector
-                | vector """
-    if len(p) == 4:
-        p[0] = AST.Vectors(p[1].vectors + [p[3]])
-    else:
-        p[0] = AST.Vectors([p[1]])
-    p[0].lineno = scanner.lexer.lineno
-
-
-def p_matrix(p):
-    """ matrix : '[' vectors ']' """
-    p[0] = AST.Matrix(p[2])
     p[0].lineno = scanner.lexer.lineno
 
 

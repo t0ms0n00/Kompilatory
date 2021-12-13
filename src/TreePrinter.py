@@ -105,16 +105,6 @@ class TreePrinter:
         if self.expressions is not None:
             self.expressions.printTree(indent + 1)
 
-    @addToClass(AST.Vectors)
-    def printTree(self, indent=0):
-        for vector in self.vectors:
-            vector.printTree(indent)
-
-    @addToClass(AST.Matrix)
-    def printTree(self, indent=0):
-        printWithIndent(indent, "VECTOR")
-        self.vectors.printTree(indent)
-
     @addToClass(AST.Assign)
     def printTree(self, indent=0):
         if self.operator == "=":

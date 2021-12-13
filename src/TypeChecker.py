@@ -31,7 +31,7 @@ class NodeVisitor(object):
 class TypeChecker(NodeVisitor):
 
     def __init__(self):
-        self.symbol_table = SymbolTable(None, 'main')
+        self.actual_scope = SymbolTable(None, 'main')
         self.loop_depth = 0
 
     def visit_Program(self, node):
@@ -46,27 +46,30 @@ class TypeChecker(NodeVisitor):
         self.visit(node.instruction)
 
     def visit_Block(self, node):
-        self.symbol_table.pushScope("block")
+        self.actual_scope = self.actual_scope.pushScope("block")
         self.visit(node.instructions)
+        self.actual_scope = self.actual_scope.popScope()
 
     def visit_If(self, node):
-        self.symbol_table.pushScope('if')
+        self.actual_scope = self.actual_scope.pushScope('if')
         self.visit(node.condition)
         self.visit(node.then_instr)
-        self.symbol_table.popScope()
+        self.actual_scope = self.actual_scope.popScope()
         if node.else_instr is not None:
-            self.symbol_table.pushScope('else')
+            self.actual_scope = self.actual_scope.pushScope('else')
             self.visit(node.else_instr)
-            self.symbol_table.popScope()
+            self.actual_scope = self.actual_scope.popScope()
 
     def visit_For(self, node):
+        self.actual_scope = self.actual_scope.pushScope('for')
         self.loop_depth += 1
         result_type = self.visit(node.range)
         if result_type != 'unknown':
             symbol = VariableSymbol(node.variable, result_type)
-            self.symbol_table.put(node.variable, symbol)
+            self.actual_scope.put(node.variable, symbol)
         self.visit(node.instruction)
         self.loop_depth -= 1
+        self.actual_scope = self.actual_scope.popScope()
 
     def visit_Range(self, node):
         left = self.visit(node.from_value)
@@ -77,13 +80,14 @@ class TypeChecker(NodeVisitor):
         return 'int'
 
     def visit_While(self, node):
+        self.actual_scope = self.actual_scope.pushScope('while')
         self.loop_depth += 1
         self.visit(node.condition)
         self.visit(node.instruction)
         self.loop_depth -= 1
+        self.actual_scope = self.actual_scope.popScope()
 
     def visit_Break(self, node):
-        # linia-1 może zmienić
         if self.loop_depth == 0:
             print("Line {}: Break outside the loop".format(node.lineno))
 
@@ -93,10 +97,15 @@ class TypeChecker(NodeVisitor):
 
     def visit_Return(self, node):
         if node.value is not None:
-            self.visit(node.value)
+            result_type = self.visit(node.value)
+            if result_type == 'unknown':
+                print("Line {}: Cannot return unknown type".format(node.lineno))
 
-    def visit_Print(self, node):
-        self.visit(node.expressions)
+    def visit_Print(self, node): #pozbyć się wężyka
+        for expression in node.expressions.expressions:
+            result_type = self.visit(expression)
+            if result_type == 'unknown':
+                print("Line {}: Cannot print unknown type".format(node.lineno))
 
     def visit_Expr(self, node):
         return self.visit(node.expression)
@@ -114,57 +123,67 @@ class TypeChecker(NodeVisitor):
             return 'float'
         return 'unknown'
 
-    def visit_Vector(self, node):
+    def visit_Vector(self, node): # przekaż wart do assign
         # print("IN")
         # print(node)
         # print(node.expressions.expressions[0].expression)
         # print(len(node.expressions.expressions))
-        expr_singletons = node.expressions.expressions
-        types_inside_vector = []
-        for expr_singleton in expr_singletons:
-            types_inside_vector.append(self.visit_Singleton(expr_singleton.expression))
-        bad_types_in_vector = False
-        for singleton_type in types_inside_vector:
-            if singleton_type == 'str' or singleton_type == 'unknown':
-                bad_types_in_vector = True
-                print("Line {}: Vector cannot have {} type inside".format(node.lineno, singleton_type))
-        if bad_types_in_vector:
+        expressions = node.expressions.expressions if node.expressions is not None else []
+        types_inside_vector = set()
+        for expr in expressions:
+            result_type = self.visit(expr)
+            result_type = 'float' if result_type == 'int' else result_type
+            types_inside_vector.add(result_type)
+        flag = False
+        if len(types_inside_vector) > 1:
+            if 'vector' in types_inside_vector:
+                print("Line {}: Matrix should contain one type, but contains {}".format(node.lineno, types_inside_vector))
+            else:
+                print(
+                    "Line {}: Vector should contain one type, but contains {}".format(node.lineno, types_inside_vector))
+            flag = True
+        if 'matrix' in types_inside_vector:
+            print("Line {}: Matrix must be 2 dimensional".format(node.lineno))
+            flag = True
+        if 'str' in types_inside_vector:
+            if 'vector' in types_inside_vector:
+                print("Line {}: Matrix cannot have str type inside".format(node.lineno))
+            else:
+                print("Line {}: Vector cannot have str type inside".format(node.lineno))
+            flag = True
+        if 'unknown' in types_inside_vector:
+            if 'vector' in types_inside_vector:
+                print("Line {}: Matrix cannot have unknown type inside".format(node.lineno))
+            else:
+                print("Line {}: Vector cannot have unknown type inside".format(node.lineno))
+            flag = True
+        if flag:
             return 'unknown'
-
+        if 'vector' in types_inside_vector:
+            vector_len = set()
+            for node in node.expressions.expressions:
+                vector_len.add(len(node.expression.expressions.expressions))
+                if len(vector_len) > 1:
+                    print("Line {}: Matrix should have vectors equal sizes, but has {}".format(node.lineno, vector_len))
+                    return 'unknown'
+            return 'matrix'
         return 'vector'
 
-    def visit_Vectors(self, node):
-        for vector in node.vectors:
-            self.visit(vector)
-
-    def visit_Matrix(self, node):
-        return 'matrix'
-
-    def visit_Assign(self, node):
-        #referencje!!!!
+    def visit_Assign(self, node): # matrix #referencje!!!!
         if node.operator == "=":
             right = self.visit(node.expression)
             if right == 'unknown':
                 print("Line {}: Cannot assign unknown type to variable".format(node.lineno))
             elif right == 'vector':
-                # print(node.expression)
-                # print(node.expression.expression)
-                # print(self.visit(node.expression.expression))
-                if self.visit_Vector(node.expression.expression) == 'vector':
-                    expr_singletons = node.expression.expression.expressions.expressions
-                    vector_length = len(expr_singletons)
-                    vector_type = 'int'
-                    for expr_singleton in expr_singletons:
-                        singleton_type = self.visit_Singleton(expr_singleton.expression)
-                        if singleton_type == 'float':
-                            vector_type = 'float'
-                    symbol = VariableSymbol(node.variable.name, vector_type, dim1=vector_length)
-                    self.symbol_table.put(node.variable.name, symbol)
+                # -------------------------------------------------------------------------------------
+                # Jak wyciągnąć vector type i vector length
+                symbol = VariableSymbol(node.variable.name, vector_type, dim1=vector_length)
+                self.actual_scope.put(node.variable.name, symbol)
             elif right == 'matrix':
-                pass
+                pass # zrobić matrix ---------------------------------------------------------------------
             else: # singleton
                 symbol = VariableSymbol(node.variable.name, right)
-                self.symbol_table.put(node.variable.name, symbol)
+                self.actual_scope.put(node.variable.name, symbol)
 
         else: # calc_assign
             operator = self.visit(node.operator)
@@ -182,27 +201,27 @@ class TypeChecker(NodeVisitor):
         return node.operator
 
     def visit_Variable(self, node):
-        if self.symbol_table.symbols[node.name].dim2 is not None:
+        if node.name not in self.actual_scope.symbols.keys():
+            print("Line {}: Reference to not defined object {}".format(node.lineno, node.name))
+            return 'unknown'
+        if self.actual_scope.symbols[node.name].dim2 is not None:
             return 'matrix'
-        elif self.symbol_table.symbols[node.name].dim1 is not None:
+        elif self.actual_scope.symbols[node.name].dim1 is not None:
             return 'vector'
         else:
-            singleton_type = self.symbol_table.symbols[node.name].type
+            singleton_type = self.actual_scope.symbols[node.name].type
             return singleton_type
 
     def visit_Comparator(self, node):
         return node.comparator
 
-    def visit_Condition(self, node):
+    def visit_Condition(self, node): # czy przekazać do if / while
         left = self.visit(node.left)
         right = self.visit(node.right)
         comparator = self.visit(node.comparator)
-
         result_type = ttype[comparator][left][right]
         if result_type == 'unknown':
             print('Line {}: Incompatible types {} and {} for operation {}'.format(node.lineno, left, right, comparator))
-
-        # czekamy co zwrócą powyższe
 
     def visit_BinOp(self, node):
         left = self.visit(node.left)
@@ -216,7 +235,7 @@ class TypeChecker(NodeVisitor):
         return result_type
 
     def visit_MatrixOp(self, node):
-        pass
+        pass # sprawdzanie rozmiaru macierzy
 
     def visit_UMinus(self, node):
         expr_type = self.visit(node.expression)
@@ -226,11 +245,50 @@ class TypeChecker(NodeVisitor):
         return ttype
 
     def visit_Transpose(self, node):
-        pass
+        result_type = self.visit(node.expression)
+        if ttype['transpose'][result_type][None] == 'unknown':
+            print("Line {}: Cannot transpose {} type".format(node.lineno, result_type))
+            return 'unknown'
+        return result_type
 
     def visit_MatrixFunc(self, node):
-        pass
-    # eye 2 wymiary
+        func = self.visit(node.func)
+        dim1 = node.dim1
+        dim2 = node.dim2
+        flag = False
+        if func == 'eye':
+            if dim2 is not None:
+                print("Line {}: Too many arguments for function eye".format(node.lineno))
+                flag = True
+            if dim1 <= 0:
+                print("Line {}: Dimension for function eye should be positive, but got {}".format(node.lineno, dim1))
+                flag = True
+            if type(dim1) != int:
+                print("Line {}: Function eye takes int parameter, but got type {}".format(node.lineno, type(dim1)))
+                flag = True
+            if flag == False:
+                return 'matrix'
+        else:
+            if dim2 is None: # vector
+                if dim1 <= 0:
+                    print("Line {}: Dimension for function eye should be positive, but got {}".format(node.lineno, dim1))
+                    flag = True
+                if type(dim1) != int:
+                    print("Line {}: Function eye takes int parameter, but got type {}".format(node.lineno, type(dim1)))
+                    flag = True
+                if flag == False:
+                    return 'vector'
+            else: #matrix
+                if dim1 <= 0 or dim2 <= 0:
+                    print("Line {}: Dimension for function eye should be positive, but got {}".format(node.lineno, dim1))
+                    flag = True
+                if type(dim1) != int or type(dim2) != int:
+                    print("Line {}: Function eye takes int parameter, but got type {}".format(node.lineno, type(dim1)))
+                    flag = True
+                if flag == False:
+                    return 'matrix'
+
+        return 'unknown'
 
     def visit_Function(self, node):
-        pass
+        return node.func

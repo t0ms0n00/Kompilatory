@@ -6,7 +6,7 @@ ttype['+']['int']['int'] = 'int'
 ttype['+']['float']['float'] = 'float'
 ttype['+']['int']['float'] = 'float'
 ttype['+']['float']['int'] = 'float'
-ttype['+']['string']['string'] = 'string'
+ttype['+']['str']['str'] = 'str'
 
 ttype['-']['int']['int'] = 'int'
 ttype['-']['float']['float'] = 'float'

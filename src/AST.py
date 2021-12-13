@@ -94,16 +94,6 @@ class Vector(Node):
 
 
 @dataclass
-class Vectors(Node):
-    vectors: Any
-
-
-@dataclass
-class Matrix(Node):
-    vectors: Any
-
-
-@dataclass
 class Assign(Node):
     operator: Any
     variable: Any

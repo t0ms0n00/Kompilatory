@@ -1,3 +1,6 @@
+import copy
+
+
 class Symbol:
     pass
 
@@ -16,7 +19,6 @@ class SymbolTable(object):
     def __init__(self, parent, name): # parent scope and symbol table name
         self.parent = parent
         self.name = name
-        self.scope = 0
         self.symbols = {}
     #
 
@@ -33,8 +35,11 @@ class SymbolTable(object):
     #
 
     def pushScope(self, name):
-        self.scope += 1 # przemyśleć
+        newScope = SymbolTable(self, name)
+        newScope.parent = self
+        newScope.symbols = copy.deepcopy(self.symbols)
+        return newScope
     #
 
     def popScope(self):
-        self.scope -= 1
+        return self.parent if self.parent is not None else print("Popping main scope is not allowed")
