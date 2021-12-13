@@ -95,7 +95,6 @@ def p_while(p):
 def p_break(p):
     """ break : BREAK """
     p[0] = AST.Break()
-    print(scanner.lexer.lineno)
     p[0].lineno = scanner.lexer.lineno
 
 
