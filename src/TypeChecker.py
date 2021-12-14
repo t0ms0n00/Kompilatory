@@ -6,7 +6,7 @@ from OperationTypes import ttype
 class NodeVisitor(object):
 
     def __init__(self):
-        # na true w każdym błędzie przed PRINT
+        # na true w każdym błędzie przed PRINT?
         self.error = False
 
     def visit(self, node):
@@ -124,15 +124,13 @@ class TypeChecker(NodeVisitor):
         return 'unknown'
 
     def visit_Vector(self, node): # przekaż wart do assign
-        # print("IN")
-        # print(node)
-        # print(node.expressions.expressions[0].expression)
-        # print(len(node.expressions.expressions))
         expressions = node.expressions.expressions if node.expressions is not None else []
         types_inside_vector = set()
         for expr in expressions:
             result_type = self.visit(expr)
             result_type = 'float' if result_type == 'int' else result_type
+            result_type = 'matrix' if isinstance(result_type, VariableSymbol) and result_type.dim2 is not None else result_type
+            result_type = 'vector' if isinstance(result_type, VariableSymbol) and result_type.dim2 is None else result_type
             types_inside_vector.add(result_type)
         flag = False
         if len(types_inside_vector) > 1:
@@ -161,28 +159,29 @@ class TypeChecker(NodeVisitor):
             return 'unknown'
         if 'vector' in types_inside_vector:
             vector_len = set()
-            for node in node.expressions.expressions:
-                vector_len.add(len(node.expression.expressions.expressions))
+            rows = 0
+            for expression in node.expressions.expressions:
+                if expression.expression.expressions is None:
+                    return VariableSymbol(None, 'float', 0, None)
+                rows += 1
+                vector_len.add(len(expression.expression.expressions.expressions))
                 if len(vector_len) > 1:
                     print("Line {}: Matrix should have vectors equal sizes, but has {}".format(node.lineno, vector_len))
                     return 'unknown'
-            return 'matrix'
-        return 'vector'
+            cols = vector_len.pop()
+            return VariableSymbol(None, 'float', rows, cols)
+        return VariableSymbol(None, 'float', len(expressions))
 
     def visit_Assign(self, node): # matrix #referencje!!!!
         if node.operator == "=":
             right = self.visit(node.expression)
             if right == 'unknown':
                 print("Line {}: Cannot assign unknown type to variable".format(node.lineno))
-            elif right == 'vector':
-                # -------------------------------------------------------------------------------------
-                # Jak wyciągnąć vector type i vector length
-                symbol = VariableSymbol(node.variable.name, vector_type, dim1=vector_length)
-                self.actual_scope.put(node.variable.name, symbol)
-            elif right == 'matrix':
-                pass # zrobić matrix ---------------------------------------------------------------------
-            else: # singleton
+            elif right == 'str' or right == 'int' or right == 'float':
                 symbol = VariableSymbol(node.variable.name, right)
+                self.actual_scope.put(node.variable.name, symbol)
+            else: # vector and matrix
+                symbol = VariableSymbol(node.variable.name, right.type, right.dim1, right.dim2)
                 self.actual_scope.put(node.variable.name, symbol)
 
         else: # calc_assign
@@ -205,9 +204,12 @@ class TypeChecker(NodeVisitor):
             print("Line {}: Reference to not defined object {}".format(node.lineno, node.name))
             return 'unknown'
         if self.actual_scope.symbols[node.name].dim2 is not None:
-            return 'matrix'
+            dim1 = self.actual_scope.symbols[node.name].dim1
+            dim2 = self.actual_scope.symbols[node.name].dim2
+            return VariableSymbol(node.name, 'float', dim1, dim2)
         elif self.actual_scope.symbols[node.name].dim1 is not None:
-            return 'vector'
+            dim1 = self.actual_scope.symbols[node.name].dim1
+            return VariableSymbol(node.name, 'float', dim1)
         else:
             singleton_type = self.actual_scope.symbols[node.name].type
             return singleton_type
@@ -235,7 +237,20 @@ class TypeChecker(NodeVisitor):
         return result_type
 
     def visit_MatrixOp(self, node):
-        pass # sprawdzanie rozmiaru macierzy
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        operator = node.operator
+        left_type = 'matrix' if isinstance(left, VariableSymbol) and left.dim2 is not None else left
+        left_type = 'vector' if isinstance(left, VariableSymbol) and left.dim2 is None else left_type
+        right_type = 'matrix' if isinstance(right, VariableSymbol) and right.dim2 is not None else right
+        right_type = 'vector' if isinstance(right, VariableSymbol) and right.dim2 is None else right_type
+        if ttype[operator][left_type][right_type] == 'unknown':
+            print('Line {}: Incompatible types {} and {} for operation {}'.format(node.lineno, left_type, right_type, operator))
+        else:
+            if left.dim1 != right.dim1 or left.dim2 != right.dim2:
+                print('Line {}: {} objects should have equal dimensions, but has: {} and {}'.
+                      format(node.lineno, left_type, (left.dim1, left.dim2), (right.dim1, right.dim2)))
+
 
     def visit_UMinus(self, node):
         expr_type = self.visit(node.expression)
@@ -267,27 +282,26 @@ class TypeChecker(NodeVisitor):
                 print("Line {}: Function eye takes int parameter, but got type {}".format(node.lineno, type(dim1)))
                 flag = True
             if flag == False:
-                return 'matrix'
+                return VariableSymbol(None, 'int', dim1, dim2)
         else:
             if dim2 is None: # vector
                 if dim1 <= 0:
-                    print("Line {}: Dimension for function eye should be positive, but got {}".format(node.lineno, dim1))
+                    print("Line {}: Dimension for function {} should be positive, but got {}".format(node.lineno, node.func, dim1))
                     flag = True
                 if type(dim1) != int:
-                    print("Line {}: Function eye takes int parameter, but got type {}".format(node.lineno, type(dim1)))
+                    print("Line {}: Function {} takes int parameter, but got type {}".format(node.lineno, node.func, type(dim1)))
                     flag = True
                 if flag == False:
-                    return 'vector'
+                    return VariableSymbol(None, 'int', dim1)
             else: #matrix
                 if dim1 <= 0 or dim2 <= 0:
-                    print("Line {}: Dimension for function eye should be positive, but got {}".format(node.lineno, dim1))
+                    print("Line {}: Dimension for function {} should be positive, but got {}".format(node.lineno, node.func, dim1))
                     flag = True
                 if type(dim1) != int or type(dim2) != int:
-                    print("Line {}: Function eye takes int parameter, but got type {}".format(node.lineno, type(dim1)))
+                    print("Line {}: Function {} takes int parameter, but got type {}".format(node.lineno, node.func, type(dim1)))
                     flag = True
                 if flag == False:
-                    return 'matrix'
-
+                    return VariableSymbol(None, 'int', dim1, dim2)
         return 'unknown'
 
     def visit_Function(self, node):

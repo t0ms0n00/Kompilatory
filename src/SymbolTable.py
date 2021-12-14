@@ -13,6 +13,9 @@ class VariableSymbol(Symbol):
         self.dim1 = dim1
         self.dim2 = dim2
 
+    def __repr__(self):
+        return 'dims: (' + str(self.dim1) + ', ' + str(self.dim2) +')'
+
 
 class SymbolTable(object):
 

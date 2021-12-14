@@ -101,7 +101,6 @@ def p_break(p):
 def p_continue(p):
     """ continue : CONTINUE """
     p[0] = AST.Continue()
-    print(scanner.lexer.lineno)
     p[0].lineno = scanner.lexer.lineno
 
 
