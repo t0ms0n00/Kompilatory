@@ -14,7 +14,11 @@ class VariableSymbol(Symbol):
         self.dim2 = dim2
 
     def __repr__(self):
-        return 'dims: (' + str(self.dim1) + ', ' + str(self.dim2) +')'
+        if self.dim1 is None:
+            return self.type
+        if self.dim2 is None:
+            return 'Vector[{}]'.format(self.dim1)
+        return 'Matrix[{}][{}]'.format(self.dim1, self.dim2)
 
 
 class SymbolTable(object):

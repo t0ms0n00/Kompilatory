@@ -101,7 +101,7 @@ class TypeChecker(NodeVisitor):
             if result_type == 'unknown':
                 print("Line {}: Cannot return unknown type".format(node.lineno))
 
-    def visit_Print(self, node): #pozbyć się wężyka
+    def visit_Print(self, node):
         for expression in node.expressions.expressions:
             result_type = self.visit(expression)
             if result_type == 'unknown':
@@ -123,7 +123,7 @@ class TypeChecker(NodeVisitor):
             return 'float'
         return 'unknown'
 
-    def visit_Vector(self, node): # przekaż wart do assign
+    def visit_Vector(self, node):
         expressions = node.expressions.expressions if node.expressions is not None else []
         types_inside_vector = set()
         for expr in expressions:
@@ -172,7 +172,7 @@ class TypeChecker(NodeVisitor):
             return VariableSymbol(None, 'float', rows, cols)
         return VariableSymbol(None, 'float', len(expressions))
 
-    def visit_Assign(self, node): # matrix #referencje!!!!
+    def visit_Assign(self, node):
         if node.operator == "=":
             right = self.visit(node.expression)
             if right == 'unknown':
@@ -200,15 +200,35 @@ class TypeChecker(NodeVisitor):
         return node.operator
 
     def visit_Variable(self, node):
+        ref_to = self.actual_scope.symbols[node.name]
+        dim1 = self.actual_scope.symbols[node.name].dim1
+        dim2 = self.actual_scope.symbols[node.name].dim2
+        if node.index1 is not None and dim1 is None:
+            print("Line {}: Reference to the dimension that not exists".format(node.lineno))
+            return 'unknown'
+        if node.index2 is not None and dim2 is None:
+            print("Line {}: Reference to the dimension that not exists".format(node.lineno))
+            return 'unknown'
+        if node.index2 is not None and node.index1 is not None: # matrix
+            if node.index1 >= dim1 or node.index2 >= dim2:
+                print("Line {}: Index out of matrix range".format(node.lineno))
+                return 'unknown'
+        if node.index1 is not None and node.index1 >= dim1: # vector
+            print("Line {}: Index out of vector range".format(node.lineno))
+            return 'unknown'
+        if node.index1 is not None and node.index2 is not None: #reference [][]
+            return ref_to.type
+        if node.index1 is not None:
+            if dim2 is None: # ref to [] and vector
+                return ref_to.type
+            else: # ref to [] and vector
+                return VariableSymbol(None, 'float', dim2)
         if node.name not in self.actual_scope.symbols.keys():
             print("Line {}: Reference to not defined object {}".format(node.lineno, node.name))
             return 'unknown'
         if self.actual_scope.symbols[node.name].dim2 is not None:
-            dim1 = self.actual_scope.symbols[node.name].dim1
-            dim2 = self.actual_scope.symbols[node.name].dim2
             return VariableSymbol(node.name, 'float', dim1, dim2)
         elif self.actual_scope.symbols[node.name].dim1 is not None:
-            dim1 = self.actual_scope.symbols[node.name].dim1
             return VariableSymbol(node.name, 'float', dim1)
         else:
             singleton_type = self.actual_scope.symbols[node.name].type
@@ -251,7 +271,6 @@ class TypeChecker(NodeVisitor):
                 print('Line {}: {} objects should have equal dimensions, but has: {} and {}'.
                       format(node.lineno, left_type, (left.dim1, left.dim2), (right.dim1, right.dim2)))
 
-
     def visit_UMinus(self, node):
         expr_type = self.visit(node.expression)
         if ttype['unary'][expr_type][None] == 'unknown':
@@ -282,7 +301,7 @@ class TypeChecker(NodeVisitor):
                 print("Line {}: Function eye takes int parameter, but got type {}".format(node.lineno, type(dim1)))
                 flag = True
             if flag == False:
-                return VariableSymbol(None, 'int', dim1, dim2)
+                return VariableSymbol(None, 'int', dim1, dim1)
         else:
             if dim2 is None: # vector
                 if dim1 <= 0:
