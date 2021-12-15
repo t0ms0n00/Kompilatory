@@ -13,7 +13,7 @@ class VariableSymbol(Symbol):
         self.dim1 = dim1
         self.dim2 = dim2
 
-    def __repr__(self):
+    def __repr__(self): # ładniejszy print typu wektor i macierz, uwzględnia ich wymiary
         if self.dim1 is None:
             return self.type
         if self.dim2 is None:
@@ -44,9 +44,10 @@ class SymbolTable(object):
     def pushScope(self, name):
         newScope = SymbolTable(self, name)
         newScope.parent = self
-        newScope.symbols = copy.deepcopy(self.symbols)
+        newScope.symbols = copy.deepcopy(self.symbols) # do wyższego zakresu dodajemy wszystkie zmienne zadeklarowane w rodzicu
         return newScope
     #
 
     def popScope(self):
         return self.parent if self.parent is not None else print("Popping main scope is not allowed")
+        # dodaliśmy kontrolę aby nigdzie nie wystąpił błąd przy użyciu funkcji pop
