@@ -7,6 +7,7 @@ import sys
 
 sys.setrecursionlimit(10000)
 
+
 class Interpreter(object):
 
 
@@ -23,16 +24,17 @@ class Interpreter(object):
         # elsif(node.op=='-') ...
         # but do not use python eval
 
-    @when(AST.Assignment)
-    def visit(self, node):
+    # @when(AST.Assignment)
+    # def visit(self, node):
+    #     pass
+    # #
+    # #
     #
-    #
-
-    # simplistic while loop interpretation
-    @when(AST.WhileInstr)
-    def visit(self, node):
-        r = None
-        while node.cond.accept(self):
-            r = node.body.accept(self)
-        return r
+    # # simplistic while loop interpretation
+    # @when(AST.WhileInstr)
+    # def visit(self, node):
+    #     r = None
+    #     while node.cond.accept(self):
+    #         r = node.body.accept(self)
+    #     return r
 
