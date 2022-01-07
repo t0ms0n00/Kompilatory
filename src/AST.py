@@ -2,9 +2,14 @@ from dataclasses import dataclass
 from typing import Any
 
 
+
 class Node(object):
     def __init__(self):
         self.lineno = 0
+
+
+    def accept(self, visitor):
+        return visitor.visit(self)
 
 
 @dataclass

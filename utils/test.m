@@ -1,52 +1,21 @@
-a = [[1,2,3],
-    [1,2],
-    [1,2,3,4,5],
-    [4,5,6,6]];
+print 1;
+print 1, 4, 5;
 
-b = [[1,2,3],
-    [4,5,6]];
+if (3 != 3)
+    print 3;
+else
+    if (5 > 3)
+        print "a", 4, 4.44;
 
-print b[1, 3];
-print b[3, 0];
+for i = 1:8
+{
 
-c = [1,2,3,4];
-print c[66];
-
-d = b + c;
-e = b + b;
-f = b + 9;
-
-g = eye(5,6);
-g = eye(0);
-g = eye(1);
-
-g = ones(5,6);
-g = ones(0);
-g = ones(1);
-
-g = zeros(5,6);
-g = zeros(0);
-g = zeros(1);
-
-while(1==1){
-    break;
-    h = 5;
+    if (i == 3)
+        continue;
+    print i;
 }
 
-break;
-print h;
+# while (5 > 3)
 
-i = [[4,5,6], [3,4,5]];
 
-print b .+ i;
-
-A = [2,3,5,6,7,8] .* [2,5];
-
-k = [
-    [[1,2], [3,4]],
-    [[5,6], [7,8]]
-];
-
-if (1==1){
-break;
-}
+# print 5;
