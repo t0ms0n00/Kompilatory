@@ -1,6 +1,7 @@
 class Memory:
 
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.symbols = {}
 
     def has_key(self, name):  # variable name
@@ -15,9 +16,8 @@ class Memory:
 
 
 class MemoryStack:
-
     def __init__(self):  # initialize memory stack with memory <memory>
-        self.stack = [Memory()]
+        self.stack = [Memory('global')]
 
     def get(self, name):  # gets from memory stack current value of variable <name>
         for i in range(len(self.stack)-1, -1, -1) :
@@ -27,17 +27,24 @@ class MemoryStack:
         return None
 
     def insert(self, name, value):  # inserts into memory stack variable <name> with value <value>
-        self.stack[-1].put(name, value)
+        for i in range(len(self.stack) - 1, -1, -1):
+            memory = self.stack[i]
+            if memory.name in ["global", "block"]:
+                self.stack[i].put(name, value)
+                break
 
     def set(self, name, value):  # sets variable <name> to value <value>
-        for i in range(len(self.stack)-1, -1, -1):
+        for i in range(len(self.stack) - 1, -1, -1):
             memory = self.stack[i]
-            if name in memory.symbols:
-                memory.symbols[name] = value
-                return
+            if memory.name in ["global", "block"] and name in memory.symbols:
+                self.stack[i].put(name, value)
+                break
 
-    # def push(self):  # pushes memory <memory> onto the stack
-    #     self.stack.append(Memory())
-    #
-    # def pop(self):  # pops the top memory from the stack
-    #     self.stack.pop()
+    def push(self, name):  # pushes memory <memory> onto the stack
+        self.stack.append(Memory(name))
+
+    def pop(self):  # pops the top memory from the stack
+        self.stack.pop()
+
+    def get_last_memory_name(self):
+        return self.stack[-1].name

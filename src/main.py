@@ -47,8 +47,8 @@ if __name__ == '__main__':
     # Below code shows how to use visitor
     typeChecker = TypeChecker()
     typeChecker.visit(ast)   # or alternatively ast.accept(typeChecker)
-
-    ast.accept(Interpreter())
+    if typeChecker.error is False:
+        ast.accept(Interpreter())
     # in future
     # ast.accept(OptimizationPass1())
     # ast.accept(OptimizationPass2())

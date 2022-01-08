@@ -30,7 +30,10 @@ ops = {
     "<=": operator.le,
 
     "unary": np.negative,
-    "transpose": np.transpose
+    "transpose": np.transpose,
+    "eye" : np.eye,
+    "ones": np.ones,
+    "zeros": np.zeros
 }
 
 # czy returny potrzebne?
@@ -62,19 +65,29 @@ class Interpreter(object):
 
     @when(AST.Block)
     def visit(self, node):
-        node.instructions.accept(self)
+        if self.memory_stack.get_last_memory_name() not in ["if", "else", "for", "while"]:
+            self.memory_stack.push('block')
+            node.instructions.accept(self)
+            self.memory_stack.pop()
+        else:
+            node.instructions.accept(self)
 
 
     @when(AST.If)
     def visit(self, node):
         if node.condition.accept(self):
+            self.memory_stack.push('if')
             node.then_instr.accept(self)
+            self.memory_stack.pop()
         elif node.else_instr is not None:
+            self.memory_stack.push('if')
             node.else_instr.accept(self)
+            self.memory_stack.pop()
 
 
     @when(AST.For) # można uprościć chyba
     def visit(self, node):
+        self.memory_stack.push('for')
         from_value, to_value = node.range.accept(self)
         self.memory_stack.insert(node.variable, from_value)
         for value in range(from_value, to_value+1):
@@ -86,7 +99,7 @@ class Interpreter(object):
                 self.memory_stack.set(node.variable, value + 1)
                 continue
             self.memory_stack.set(node.variable, value + 1)
-
+        self.memory_stack.pop()
 
 
     @when(AST.Range)
@@ -96,6 +109,7 @@ class Interpreter(object):
 
     @when(AST.While)
     def visit(self, node):
+        self.memory_stack.push('while')
         while node.condition.accept(self):
             try:
                 node.instruction.accept(self)
@@ -103,7 +117,7 @@ class Interpreter(object):
                 break
             except ContinueException:
                 continue
-
+        self.memory_stack.pop()
 
     @when(AST.Break)
     def visit(self, node):
@@ -124,7 +138,10 @@ class Interpreter(object):
     def visit(self, node):
         expressions = node.expressions.accept(self)
         for expr in expressions:
-            print(expr, end=' ')
+            if type(expr) == str:
+                print(expr[1:-1], end=' ')
+            else:
+                print(expr, end=' ')
         print()
 
 
@@ -148,22 +165,59 @@ class Interpreter(object):
 
     @when(AST.Vector)
     def visit(self, node):
-        pass
+        vector = [] if node.expressions is None else node.expressions.accept(self)
+        return np.array(vector)
 
 
     @when(AST.Assign)
     def visit(self, node):
-        pass
+        variable_name = node.variable.name
+        index1 = node.variable.index1 - 1 if node.variable.index1 is not None else None
+        index2 = node.variable.index2 - 1 if node.variable.index2 is not None else None
+        expr = node.expression.accept(self)
+        if index2 is not None:
+            if node.operator == "=":
+                matrix = self.memory_stack.get(variable_name)
+                matrix[index1, index2] = expr
+                self.memory_stack.insert(variable_name, matrix)
+            else:
+                oper = node.operator.accept(self)
+                matrix = self.memory_stack.get(variable_name)
+                matrix[index1, index2] = ops[oper](matrix[index1, index2], expr)
+                self.memory_stack.set(variable_name, matrix)
+        elif index1 is not None:
+            if node.operator == "=":
+                matrix = self.memory_stack.get(variable_name)
+                matrix[index1] = expr
+                self.memory_stack.insert(variable_name, matrix)
+            else:
+                oper = node.operator.accept(self)
+                matrix = self.memory_stack.get(variable_name)
+                matrix[index1] = ops[oper](matrix[index1], expr)
+                self.memory_stack.set(variable_name, matrix)
+        else:
+            if node.operator == "=":
+                self.memory_stack.insert(variable_name, expr)
+            else:
+                oper = node.operator.accept(self)
+                value = self.memory_stack.get(variable_name)
+                new_value = ops[oper](value, expr)
+                self.memory_stack.set(variable_name, new_value)
 
 
     @when(AST.CalcAssign)
     def visit(self, node):
-        pass
+        return node.operator
 
 
     @when(AST.Variable)
     def visit(self, node):
-        # dodać warunek na referencje (index1 i index2 != None)
+        index1 = node.index1 - 1 if node.index1 is not None else None
+        index2 = node.index2 - 1 if node.index2 is not None else None
+        if index2 is not None:
+            return self.memory_stack.get(node.name)[index1, index2]
+        elif index1 is not None:
+            return self.memory_stack.get(node.name)[index1]
         return self.memory_stack.get(node.name)
 
 
@@ -179,40 +233,50 @@ class Interpreter(object):
         comparator = node.comparator.accept(self)
         return ops[comparator](left, right)
 
+
     @when(AST.BinOp)
     def visit(self, node):
-        r1 = node.left.accept(self)
-        r2 = node.right.accept(self)
-        # try sth smarter than:
-        # if(node.op=='+') return r1+r2
-        # elsif(node.op=='-') ...
-        # but do not use python eval
-        pass
+        left = node.left.accept(self)
+        right = node.right.accept(self)
+        oper = node.operator
+        if type(ops[oper](left, right)) == str:
+            return "\"" + ops[oper](left, right).replace("\"", "") + "\""
+        return ops[oper](left, right)
 
 
     @when(AST.MatrixOp)
     def visit(self, node):
-        pass
+        left = node.left.accept(self)
+        right = node.right.accept(self)
+        oper = node.operator
+        return ops[oper](left, right)
 
 
     @when(AST.UMinus)
     def visit(self, node):
-        pass
+        expr = node.expression.accept(self)
+        return ops["unary"](expr)
 
 
     @when(AST.Transpose)
     def visit(self, node):
-        pass
+        expr = node.expression.accept(self)
+        return ops["transpose"](expr)
 
 
     @when(AST.MatrixFunc)
     def visit(self, node):
-        pass
+        func = node.func.accept(self)
+        dim1 = node.dim1
+        dim2 = node.dim2
+        if dim2 is None:
+            return ops[func](dim1)
+        return ops[func]((dim1, dim2))
 
 
     @when(AST.Function)
     def visit(self, node):
-        pass
+        return node.func
 
 
     @when(AST.Error)

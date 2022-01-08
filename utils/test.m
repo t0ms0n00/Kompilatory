@@ -1,21 +1,9 @@
-print 1;
-print 1, 4, 5;
+x = eye(5);
+y = x[1];
+print y;
+print x[1];
 
-if (3 != 3)
-    print 3;
-else
-    if (5 > 3)
-        print "a", 4, 4.44;
+x[2] = x[2] .+ [1,1,1,1,1];
 
-for i = 1:8
-{
+print x;
 
-    if (i == 3)
-        continue;
-    print i;
-}
-
-# while (5 > 3)
-
-
-# print 5;

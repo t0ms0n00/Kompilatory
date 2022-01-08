@@ -17,6 +17,8 @@ ttype['*']['int']['int'] = 'int'
 ttype['*']['float']['float'] = 'float'
 ttype['*']['int']['float'] = 'float'
 ttype['*']['float']['int'] = 'float'
+ttype['*']['int']['str'] = 'str'
+ttype['*']['str']['int'] = 'str'
 
 ttype['/']['int']['int'] = 'float'
 ttype['/']['float']['float'] = 'float'
