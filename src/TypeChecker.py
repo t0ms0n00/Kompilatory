@@ -312,6 +312,10 @@ class TypeChecker(NodeVisitor):
 
     def visit_UMinus(self, node):
         expr_type = self.visit(node.expression)
+        expr_type = 'matrix' if isinstance(expr_type,
+                                             VariableSymbol) and expr_type.dim2 is not None else expr_type
+        expr_type = 'vector' if isinstance(expr_type, VariableSymbol) and expr_type.dim2 is None else expr_type
+
         if ttype['unary'][expr_type][None] == 'unknown':
             print("Line {}: Unary minus cannot be before type {}".format(node.lineno, expr_type))
             self.error = True
@@ -320,6 +324,9 @@ class TypeChecker(NodeVisitor):
 
     def visit_Transpose(self, node):
         result_type = self.visit(node.expression)
+        result_type = 'matrix' if isinstance(result_type,
+                                             VariableSymbol) and result_type.dim2 is not None else result_type
+        result_type = 'vector' if isinstance(result_type, VariableSymbol) and result_type.dim2 is None else result_type
         if ttype['transpose'][result_type][None] == 'unknown':
             print("Line {}: Cannot transpose {} type".format(node.lineno, result_type))
             self.error = True

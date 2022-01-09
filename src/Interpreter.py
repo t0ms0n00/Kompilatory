@@ -36,7 +36,6 @@ ops = {
     "zeros": np.zeros
 }
 
-# czy returny potrzebne?
 
 class Interpreter(object):
     def __init__(self):
@@ -46,22 +45,21 @@ class Interpreter(object):
     def visit(self, node):
         pass
 
-
     @when(AST.Program)
     def visit(self, node):
-        node.instructions.accept(self)
-
+        try:
+            node.instructions.accept(self)
+        except ReturnValueException as e:
+            print("RETURN ", e.value)
 
     @when(AST.Instructions)
     def visit(self, node):
         for instruction in node.instructions:
             instruction.accept(self)
 
-
     @when(AST.Instruction)
     def visit(self, node):
         node.instruction.accept(self)
-
 
     @when(AST.Block)
     def visit(self, node):
@@ -71,7 +69,6 @@ class Interpreter(object):
             self.memory_stack.pop()
         else:
             node.instructions.accept(self)
-
 
     @when(AST.If)
     def visit(self, node):
@@ -83,7 +80,6 @@ class Interpreter(object):
             self.memory_stack.push('if')
             node.else_instr.accept(self)
             self.memory_stack.pop()
-
 
     @when(AST.For) # można uprościć chyba
     def visit(self, node):
@@ -101,11 +97,9 @@ class Interpreter(object):
             self.memory_stack.set(node.variable, value + 1)
         self.memory_stack.pop()
 
-
     @when(AST.Range)
     def visit(self, node):
         return node.from_value.accept(self), node.to_value.accept(self)
-
 
     @when(AST.While)
     def visit(self, node):
@@ -123,16 +117,13 @@ class Interpreter(object):
     def visit(self, node):
         raise BreakException()
 
-
     @when(AST.Continue)
     def visit(self, node):
         raise ContinueException()
 
-
     @when(AST.Return)
     def visit(self, node):
-        raise ValueException(node.value.accept(self))
-
+        raise ReturnValueException(node.value.accept(self))
 
     @when(AST.Print)
     def visit(self, node):
@@ -144,11 +135,9 @@ class Interpreter(object):
                 print(expr, end=' ')
         print()
 
-
     @when(AST.Expr)
     def visit(self, node):
         return node.expression.accept(self)
-
 
     @when(AST.Expressions)
     def visit(self, node):
@@ -157,17 +146,14 @@ class Interpreter(object):
             expressions.append(expr.accept(self))
         return expressions
 
-
     @when(AST.Singleton)
     def visit(self, node):
         return node.singleton
-
 
     @when(AST.Vector)
     def visit(self, node):
         vector = [] if node.expressions is None else node.expressions.accept(self)
         return np.array(vector)
-
 
     @when(AST.Assign)
     def visit(self, node):
@@ -204,11 +190,9 @@ class Interpreter(object):
                 new_value = ops[oper](value, expr)
                 self.memory_stack.set(variable_name, new_value)
 
-
     @when(AST.CalcAssign)
     def visit(self, node):
         return node.operator
-
 
     @when(AST.Variable)
     def visit(self, node):
@@ -220,11 +204,9 @@ class Interpreter(object):
             return self.memory_stack.get(node.name)[index1]
         return self.memory_stack.get(node.name)
 
-
     @when(AST.Comparator)
     def visit(self, node):
         return node.comparator
-
 
     @when(AST.Condition)
     def visit(self, node):
@@ -232,7 +214,6 @@ class Interpreter(object):
         right = node.right.accept(self)
         comparator = node.comparator.accept(self)
         return ops[comparator](left, right)
-
 
     @when(AST.BinOp)
     def visit(self, node):
@@ -243,7 +224,6 @@ class Interpreter(object):
             return "\"" + ops[oper](left, right).replace("\"", "") + "\""
         return ops[oper](left, right)
 
-
     @when(AST.MatrixOp)
     def visit(self, node):
         left = node.left.accept(self)
@@ -251,18 +231,15 @@ class Interpreter(object):
         oper = node.operator
         return ops[oper](left, right)
 
-
     @when(AST.UMinus)
     def visit(self, node):
         expr = node.expression.accept(self)
         return ops["unary"](expr)
 
-
     @when(AST.Transpose)
     def visit(self, node):
         expr = node.expression.accept(self)
         return ops["transpose"](expr)
-
 
     @when(AST.MatrixFunc)
     def visit(self, node):
@@ -273,11 +250,9 @@ class Interpreter(object):
             return ops[func](dim1)
         return ops[func]((dim1, dim2))
 
-
     @when(AST.Function)
     def visit(self, node):
         return node.func
-
 
     @when(AST.Error)
     def visit(self, node):
