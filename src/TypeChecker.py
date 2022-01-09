@@ -133,7 +133,7 @@ class TypeChecker(NodeVisitor):
             # razem (bo reguły operacji pozwalają na operacje binarne int z float), zatem castujemy element typu int na float
             result_type = 'matrix' if isinstance(result_type, VariableSymbol) and result_type.dim2 is not None else result_type
             # jeśli visit_Variable zwróciło info o macierzy lub wektorze to dajemy ładniejszy alias nazwy typu
-            result_type = 'vector' if isinstance(result_type, VariableSymbol) and result_type.dim2 is None else result_type
+            result_type = 'vector' if isinstance(result_type, VariableSymbol) and result_type.dim2 is None and result_type.dim1 is not None else result_type
             types_inside_vector.add(result_type)
         flag = False
         if len(types_inside_vector) > 1: # wymaganie że elementy jednakowego typu wewnątrz
@@ -296,9 +296,9 @@ class TypeChecker(NodeVisitor):
         right = self.visit(node.right)
         operator = node.operator
         left_type = 'matrix' if isinstance(left, VariableSymbol) and left.dim2 is not None else left # nadawanie aliasów typom macierz i wektor
-        left_type = 'vector' if isinstance(left, VariableSymbol) and left.dim2 is None else left_type
+        left_type = 'vector' if isinstance(left, VariableSymbol) and left.dim2 is None and left.dim1 is not None else left_type
         right_type = 'matrix' if isinstance(right, VariableSymbol) and right.dim2 is not None else right
-        right_type = 'vector' if isinstance(right, VariableSymbol) and right.dim2 is None else right_type
+        right_type = 'vector' if isinstance(right, VariableSymbol) and right.dim2 is None and right.dim1 is not None else right_type
         if ttype[operator][left_type][right_type] == 'unknown': # operacja niemożliwa do wykonania na danych typach
             print('Line {}: Incompatible types {} and {} for operation {}'.format(node.lineno, left_type, right_type, operator))
             self.error = True
@@ -314,7 +314,7 @@ class TypeChecker(NodeVisitor):
         expr_type = self.visit(node.expression)
         expr_type = 'matrix' if isinstance(expr_type,
                                              VariableSymbol) and expr_type.dim2 is not None else expr_type
-        expr_type = 'vector' if isinstance(expr_type, VariableSymbol) and expr_type.dim2 is None else expr_type
+        expr_type = 'vector' if isinstance(expr_type, VariableSymbol) and expr_type.dim2 is None and expr_type.dim1 is not None else expr_type
 
         if ttype['unary'][expr_type][None] == 'unknown':
             print("Line {}: Unary minus cannot be before type {}".format(node.lineno, expr_type))
@@ -326,7 +326,7 @@ class TypeChecker(NodeVisitor):
         result_type = self.visit(node.expression)
         result_type = 'matrix' if isinstance(result_type,
                                              VariableSymbol) and result_type.dim2 is not None else result_type
-        result_type = 'vector' if isinstance(result_type, VariableSymbol) and result_type.dim2 is None else result_type
+        result_type = 'vector' if isinstance(result_type, VariableSymbol) and result_type.dim2 is None and result_type.dim1 is not None else result_type
         if ttype['transpose'][result_type][None] == 'unknown':
             print("Line {}: Cannot transpose {} type".format(node.lineno, result_type))
             self.error = True
