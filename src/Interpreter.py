@@ -81,7 +81,7 @@ class Interpreter(object):
             node.else_instr.accept(self)
             self.memory_stack.pop()
 
-    @when(AST.For) # można uprościć chyba
+    @when(AST.For)
     def visit(self, node):
         self.memory_stack.push('for')
         from_value, to_value = node.range.accept(self)
